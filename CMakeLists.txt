@@ -4,7 +4,11 @@ project("simple-software-renderer")
 find_library(SDL2 SDL2)
 find_package(SDL2 REQUIRED)
 
+include_directories(vendor/glm/)
+
+
 #creating the executable of the simple software renderer
+include_directories(src/)
 file(GLOB_RECURSE "ssr" SRC src/*.cpp)
 add_executable(ssr ${ssr})
 
