@@ -16,7 +16,8 @@ namespace ssr
 		float b;
 	};
 
-	//
+
+	int init();
 	//renderer
 	void render(struct ssr::vertex vertex);
 }
