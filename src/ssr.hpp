@@ -4,6 +4,7 @@
 
 namespace ssr
 {
+	//data
 	struct vertex
 	{
 		float x;
@@ -14,6 +15,8 @@ namespace ssr
 		float g;
 		float b;
 	};
-}
 
-float* ssr_get_data();
+	//
+	//renderer
+	void render(struct ssr::vertex vertex);
+}
