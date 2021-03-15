@@ -29,7 +29,7 @@ namespace ssr
 
 		public:
 			renderer();
+			void render(struct ssr::vertex vertex);
 
 	};
-	void render(struct ssr::vertex vertex);
 }

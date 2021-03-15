@@ -29,12 +29,20 @@ ssr::renderer::renderer()
 		}
 
 	//creating render surface
-	surface = SDL_CreateRGBSurfaceWithFormat(0, res_x, res_y, 32, SDL_PIXELFORMAT_RGBA32);
+	surface = SDL_CreateRGBSurfaceWithFormat(	0, 
+												res_x,
+												res_y,
+												32,
+												SDL_PIXELFORMAT_RGBA32);
+		if(surface==NULL)
+		{
+			std::cout << "SDL couldn't create render surface" << std::endl;
+		}
 
 	SDL_Delay(1000);
 }
 
-void ssr::render(struct ssr::vertex vertex)
+void ssr::renderer::render(struct ssr::vertex vertex)
 {
 	//counting the rendered vertices
 	static unsigned int num_vertices = 0;

@@ -13,9 +13,9 @@ int main()
 	ssr::vertex vertex2={1,0,1,1,1,1};
 	ssr::vertex vertex3={0,1,1,1,1,1};
 
-	ssr::render(vertex1);
-	ssr::render(vertex2);
-	ssr::render(vertex3);
+	renderer.render(vertex1);
+	renderer.render(vertex2);
+	renderer.render(vertex3);
 
 	return 0;
 }
