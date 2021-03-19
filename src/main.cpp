@@ -10,9 +10,9 @@ int main()
 	ssr::renderer renderer;
 
 	//test triangle
-	ssr::vertex vertex1={0.9,0,0.1,255,255,255};
+	ssr::vertex vertex1={0.1,0,0.1,255,255,255};
 	ssr::vertex vertex2={0.2,0,1,255,255,255};
-	ssr::vertex vertex3={0.9,0.9,1,255,255,255};
+	ssr::vertex vertex3={0.1,0.1,1,255,255,255};
 
 
 	renderer.render(vertex1);

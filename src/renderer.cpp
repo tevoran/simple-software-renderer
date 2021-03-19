@@ -68,18 +68,20 @@ ssr::renderer::renderer()
 
 void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
-	//RGB pixel format
-	//highest byte is red, lowest byte is blue
-	if(pixel_type == SDL_PIXELFORMAT_RGB888)
+	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h))
 	{
-		uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-		uint32_t pixel_colored = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
-		pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
-
-	}
-	else
-	{
-		std::cout << "SDL: unknown pixel format" << std::endl;
+		//RGB pixel format
+		//highest byte is red, lowest byte is blue
+		if(pixel_type == SDL_PIXELFORMAT_RGB888)
+		{
+				uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+				uint32_t pixel_colored = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
+				pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
+		}
+		else
+		{
+			std::cout << "SDL: unknown pixel format" << std::endl;
+		}
 	}
 }
 
