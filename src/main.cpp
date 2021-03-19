@@ -10,17 +10,10 @@ int main()
 	ssr::renderer renderer;
 
 	//test triangle
-	ssr::vertex vertex1={0,0,1,1,1,1};
-	ssr::vertex vertex2={1,0,1,1,1,1};
-	ssr::vertex vertex3={0,1,1,1,1,1};
+	ssr::vertex vertex1={0.9,0,0.1,255,255,255};
+	ssr::vertex vertex2={0.2,0,1,255,255,255};
+	ssr::vertex vertex3={0.9,0.9,1,255,255,255};
 
-	renderer.draw_pixel(100,100,255,255,255);
-
-	int y=100;
-	for(int x=0; x<600; x++)
-	{
-		renderer.draw_pixel(x,y,255,255,255);
-	}
 
 	renderer.render(vertex1);
 	renderer.render(vertex2);
