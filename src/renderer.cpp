@@ -92,22 +92,71 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
-void ssr::renderer::render(struct ssr::vertex vertex)
+void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex2)
 {
 	//counting the rendered vertices
 	static unsigned int num_vertices = 0;
-	num_vertices++;
 
 	//show vertex data
+	num_vertices++;
 	std::cout << "render vertex " << num_vertices << std::endl;
-	std::cout << "location: " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
-	std::cout << "color: " << (int)vertex.r << " " << (int)vertex.g << " " << (int)vertex.b << std::endl;
+	std::cout << "location: " << vertex1.x << " " << vertex1.y << " " << vertex1.z << std::endl;
+	std::cout << "color: " << (int)vertex1.r << " " << (int)vertex1.g << " " << (int)vertex1.b << std::endl;
+
+	num_vertices++;
+	std::cout << "render vertex " << num_vertices << std::endl;
+	std::cout << "location: " << vertex2.x << " " << vertex2.y << " " << vertex2.z << std::endl;
+	std::cout << "color: " << (int)vertex2.r << " " << (int)vertex2.g << " " << (int)vertex2.b << std::endl;
+
+	//draw a line with the Bresenham algorithm
+	int32_t bresenham_x=(float)vertex1.x*backbuffer->w;
+	int32_t bresenham_y=(float)vertex1.y*backbuffer->h;
+	int32_t bresenham_dx=((float)vertex2.x-(float)vertex1.x)*backbuffer->w;
+	int32_t bresenham_dy=((float)vertex2.y-(float)vertex1.y)*backbuffer->h;
+	int32_t bresenham_endx=(float)vertex2.x*backbuffer->w;
+	int32_t bresenham_endy=(float)vertex2.y*backbuffer->h;
+
+		//deciding which is the fast axis
+		//fast x
+		if(bresenham_dx*bresenham_dx > bresenham_dy*bresenham_dy)
+		{
+			int32_t bresenham_error=bresenham_dx/2;
+
+			//first pixel
+			draw_pixel(bresenham_x, bresenham_y, vertex1.r, vertex1.g, vertex1.b);
+
+			std::cout << "dy: " << bresenham_dy << std::endl;
+			while(bresenham_x!=bresenham_endx)
+			{
+				bresenham_x++;
+				bresenham_error-=bresenham_dy;
+				std::cout << bresenham_x << "x" << bresenham_y << " error: " << bresenham_error << std::endl;
+				if(bresenham_error<0)
+					{
+						bresenham_y++;
+						bresenham_error+=bresenham_dx;
+					}
+				draw_pixel(bresenham_x, bresenham_y, vertex1.r, vertex1.g, vertex1.b);
+			}
+
+		}
+
+		//fast y
+		if(bresenham_dx*bresenham_dx < bresenham_dy*bresenham_dy)
+		{
+			std::cout << "lolo" << std::endl;
+		}
+
+
+
+
+
 
 	//vertex transformation aka vertex shader
-	glm::vec4 vex={vertex.x, vertex.y, vertex.z, 0};
+	glm::vec4 vex={vertex1.x, vertex1.y, vertex1.z, 0};
 
 
-	//rasterization
+	//rasterization of the pixel
 	int32_t x,y;
 	x=(float)vex.x*(backbuffer->w);
 	y=(float)vex.y*(backbuffer->h);
@@ -116,7 +165,7 @@ void ssr::renderer::render(struct ssr::vertex vertex)
 	std::cout << "XxY: " << vex.x << " " << vex.y << std::endl;
 	std::cout << "XxY (rasterized): " << x << "x" << y << std::endl;
 
-	draw_pixel(x,y,vertex.r, vertex.g, vertex.b);
+	//draw_pixel(x,y,vertex1.r, vertex1.g, vertex1.b);
 
 	//render changed backbuffer onto the screen
 	if(SDL_UpdateWindowSurface(window)!=0)
