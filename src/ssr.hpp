@@ -39,6 +39,8 @@ namespace ssr
 
 			glm::mat4 perspective_mat; //set in constructor
 
+			float *z_buffer = NULL; //set in constructor
+
 		private:
 
 

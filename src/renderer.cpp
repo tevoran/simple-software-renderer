@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <iostream>
 #include <math.h>
+#include <exception>
 
 ssr::renderer::renderer()
 {
@@ -16,7 +17,7 @@ ssr::renderer::renderer()
 		}
 		else
 		{
-			std::cout << "SDL ERROR while initializing SDL" << std::endl;
+			throw "SDL ERROR while initializing SDL";
 		}
 
 	//SDL creating window
@@ -27,14 +28,14 @@ ssr::renderer::renderer()
 											0);
 		if(window==NULL)
 		{
-			std::cout << "SDL couldn't create window" << std::endl;
+			throw "SDL couldn't create window";
 		}
 
 	//creating render surfaces
 	backbuffer = SDL_GetWindowSurface(window);
 		if(backbuffer==NULL)
 		{
-			std::cout << "SDL couldn't create render surface" << std::endl;
+			throw "SDL couldn't create render surface";
 		}
 		else
 		{
@@ -44,25 +45,29 @@ ssr::renderer::renderer()
 		}
 
 	//renderer initialization
-	perspective_mat[0].x=tan(0.5*PI-0.5*fov);
-	perspective_mat[0].y=0;
-	perspective_mat[0].z=0;
-	perspective_mat[0].w=0;
+		//Z-Buffer initialization
+		z_buffer=new float[backbuffer->w * backbuffer->h];
 
-	perspective_mat[1].x=0;
-	perspective_mat[1].y=1;
-	perspective_mat[1].z=0;
-	perspective_mat[1].w=0;
+		//Projection matrix
+		perspective_mat[0].x=tan(0.5*PI-0.5*fov);
+		perspective_mat[0].y=0;
+		perspective_mat[0].z=0;
+		perspective_mat[0].w=0;
 
-	perspective_mat[2].x=0;
-	perspective_mat[2].y=0;
-	perspective_mat[2].z=1;
-	perspective_mat[2].w=0;
+		perspective_mat[1].x=0;
+		perspective_mat[1].y=1;
+		perspective_mat[1].z=0;
+		perspective_mat[1].w=0;
 
-	perspective_mat[3].x=0;
-	perspective_mat[3].y=0;
-	perspective_mat[3].z=0;
-	perspective_mat[3].w=1;
+		perspective_mat[2].x=0;
+		perspective_mat[2].y=0;
+		perspective_mat[2].z=1;
+		perspective_mat[2].w=0;
+
+		perspective_mat[3].x=0;
+		perspective_mat[3].y=0;
+		perspective_mat[3].z=0;
+		perspective_mat[3].w=1;
 
 }
 
@@ -80,7 +85,7 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 		}
 		else
 		{
-			std::cout << "SDL: unknown pixel format" << std::endl;
+			throw "SDL: unknown pixel format";
 		}
 	}
 }
