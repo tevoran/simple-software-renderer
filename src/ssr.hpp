@@ -27,7 +27,7 @@ namespace ssr
 	{
 		private:
 			int res_x=800;
-			int res_y=600;
+			int res_y=800;
 			SDL_Window *window = NULL; //set in constructor
 			SDL_Surface *backbuffer = NULL; //set in constructor
 			uint32_t pixel_type; //set in constructor
@@ -42,12 +42,13 @@ namespace ssr
 			float *z_buffer = NULL; //set in constructor
 
 		private:
-
+			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
+			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3);
 
 		public:
 			renderer();
 			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
-			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2);
+			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3);
 
 	};
 }
