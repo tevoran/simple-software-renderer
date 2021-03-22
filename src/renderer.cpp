@@ -71,6 +71,20 @@ ssr::renderer::renderer()
 
 }
 
+void ssr::renderer::clear(uint8_t r, uint8_t g, uint8_t b)
+{
+	if(pixel_type == SDL_PIXELFORMAT_RGB888)
+	{
+		uint32_t clear_color = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
+		uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+		for(int i=0; i<(backbuffer->w*backbuffer->h); i++)
+		{
+			pixel_ptr[i]=clear_color;
+		}
+	}
+
+}
+
 void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
 	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h))

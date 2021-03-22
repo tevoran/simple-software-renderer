@@ -22,6 +22,7 @@ int main()
 		{
 					vertex2={0.2*cos(i)+0.5, 0.2*(float)sin(i)+0.5, 1, 255, 255, 255};
 					renderer.render(vertex1, vertex2, vertex3);
+					renderer.clear(0,0,0);
 		}
 
 	}
