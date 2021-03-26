@@ -73,6 +73,8 @@ ssr::renderer::renderer()
 
 void ssr::renderer::clear(uint8_t r, uint8_t g, uint8_t b)
 {
+	//RGB pixel format
+	//highest byte is red, lowest byte is blue
 	if(pixel_type == SDL_PIXELFORMAT_RGB888)
 	{
 		uint32_t clear_color = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
@@ -81,6 +83,10 @@ void ssr::renderer::clear(uint8_t r, uint8_t g, uint8_t b)
 		{
 			pixel_ptr[i]=clear_color;
 		}
+	}
+	else
+	{
+		throw "SDL: unknown pixel format and cannot clear the screen";
 	}
 
 }
@@ -99,7 +105,7 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 		}
 		else
 		{
-			throw "SDL: unknown pixel format";
+			throw "SDL: unknown pixel format and cannot draw a pixel";
 		}
 	}
 }
@@ -112,7 +118,7 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 	static unsigned int num_vertices = 0;
 
 	//show vertex data
-	num_vertices++;
+	/*num_vertices++;
 	std::cout << "render vertex " << num_vertices << std::endl;
 	std::cout << "location: " << vertex1.x << " " << vertex1.y << " " << vertex1.z << std::endl;
 	std::cout << "color: " << (int)vertex1.r << " " << (int)vertex1.g << " " << (int)vertex1.b << std::endl;
@@ -120,7 +126,7 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 	num_vertices++;
 	std::cout << "render vertex " << num_vertices << std::endl;
 	std::cout << "location: " << vertex2.x << " " << vertex2.y << " " << vertex2.z << std::endl;
-	std::cout << "color: " << (int)vertex2.r << " " << (int)vertex2.g << " " << (int)vertex2.b << std::endl;
+	std::cout << "color: " << (int)vertex2.r << " " << (int)vertex2.g << " " << (int)vertex2.b << std::endl;*/
 
 	//draw a line with the Bresenham algorithm
 	/*int32_t bresenham_x=(float)vertex1.x*backbuffer->w;
@@ -177,8 +183,8 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 	y=(float)vex.y*(backbuffer->h);
 
 
-	std::cout << "XxY: " << vex.x << " " << vex.y << std::endl;
-	std::cout << "XxY (rasterized): " << x << "x" << y << std::endl;
+	/*std::cout << "XxY: " << vex.x << " " << vex.y << std::endl;
+	std::cout << "XxY (rasterized): " << x << "x" << y << std::endl;*/
 
 	//draw_pixel(x,y,vertex1.r, vertex1.g, vertex1.b);
 

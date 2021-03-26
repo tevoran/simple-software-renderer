@@ -23,58 +23,6 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 	draw_pixel(bresenham_x, bresenham_y, r, g, b);
 
 
-	//catching edgecases
-		//line is just one point
-		if(bresenham_dx==0 && bresenham_dy==0)
-		{
-			return;
-		}
-
-
-		//line parallel to x-axis in positive direction
-		if(bresenham_dy==0 && bresenham_dx>0)
-		{
-			while(bresenham_x<=bresenham_endx)
-			{
-				bresenham_x++;
-				draw_pixel(bresenham_x,bresenham_y, r, g, b);	
-			}
-			return;
-		}
-
-		//line parallel to x-axis in negative direction
-		if(bresenham_dy==0 && bresenham_dx<0)
-		{
-			while(bresenham_x>=bresenham_endx)
-			{
-				bresenham_x--;
-				draw_pixel(bresenham_x, bresenham_y, r, g, b);
-			}
-			return;
-		}
-
-		//line parallel to y-axis in positive direction
-		if(bresenham_dx==0 && bresenham_dy>0)
-		{
-			while(bresenham_y<=bresenham_endy)
-			{
-				bresenham_y++;
-				draw_pixel(bresenham_x, bresenham_y, r, g, b);
-			}
-			return;
-		}
-
-		//line parallel to y-axis in negative direction
-		if(bresenham_dx==0 && bresenham_dy<0)
-		{
-			while(bresenham_y>=bresenham_endy)
-			{
-				bresenham_y--;
-				draw_pixel(bresenham_x, bresenham_y, r, g, b);
-			}
-			return;
-		}
-
 	//regular cases
 		int32_t fast;
 		int32_t fast_end;
