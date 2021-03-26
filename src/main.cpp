@@ -21,20 +21,20 @@ int main()
 		ssr::vertex vertex3={0.9,0.5,1,255,255,255};
 
 
-		for(float i=0; i<100; i=i+0.01)
+		for(float i=0; i<30; i=i+1)
 		{
 					vertex2={0.2*cos(i)+0.5, 0.2*(float)sin(i)+0.5, 1, 255, 255, 255};
 
 							std::clock_t clock_begin = std::clock();
 							for(uint32_t i = reps; i > 0; i--)
 							{
-								renderer.render(vertex1, vertex3, vertex2);	
+								renderer.render(vertex1, vertex2, vertex3);	
 							}
 							std::clock_t clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 
-					renderer.clear(0,0,0);
+					//renderer.clear(0,0,0);
 		}
 
 	}
@@ -45,6 +45,6 @@ int main()
 
 
 
-	SDL_Delay(5000);
+	//SDL_Delay(5000);
 	return 0;
 }

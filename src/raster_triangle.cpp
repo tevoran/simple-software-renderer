@@ -20,7 +20,7 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 	int32_t bresenham_endy=end.y;
 
 	//first pixel
-	draw_pixel(bresenham_x, bresenham_y, r, g, b);
+	draw_pixel(start.x, start.y, r, g, b);
 
 
 	//regular cases
@@ -29,6 +29,11 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 		int32_t fast_d;
 		int32_t slow;
 		int32_t slow_d;
+
+		//drawing location variables
+		int32_t fast_x_choice;
+		int32_t fast_y_choice;
+
 		//fast x
 		if(bresenham_dx*bresenham_dx>=bresenham_dy*bresenham_dy)
 		{
@@ -37,6 +42,8 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 			fast_d=bresenham_dx;
 			slow=bresenham_y;
 			slow_d=bresenham_dy;
+			fast_x_choice=1;
+			fast_y_choice=0;
 		}
 
 		//fast y
@@ -47,70 +54,48 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 			fast_d=bresenham_dy;
 			slow=bresenham_x;
 			slow_d=bresenham_dx;
+			fast_x_choice=0;
+			fast_y_choice=1;
 		}
+
+		//using multiplications instead of if's
+		int32_t fast_cond;
+		int32_t slow_cond;
+
+		if(fast_d>=0)
+		{
+			fast_cond=1;
+		}
+		else
+		{
+			fast_cond=-1;
+		}
+
+		if(slow_d>=0)
+		{
+			slow_cond=-1;
+		}
+		else
+		{
+			slow_cond=1;
+		}
+
 
 			int32_t bresenham_error=fast_d/2;
 
 				while(fast!=fast_end)
 				{
-					if(fast_d>=0)
-						{
-							fast++;
-						}
-						else
-						{
-							fast--;
-						}
 
-					if(slow_d>=0)
-						{
-							bresenham_error-=slow_d;
-						}
-						else
-						{
-							bresenham_error+=slow_d;
-						}
-					if(bresenham_error>1000)
-					{
-						exit(0);
-					}
+					fast=fast+fast_cond;
+					bresenham_error=bresenham_error+slow_cond*slow_d;
+
 					if(bresenham_error<=0)
 					{
-						if(slow_d>=0)
-							{
-								if(fast_d>=0)
-								{
-									bresenham_error+=fast_d;
-								}
-								else
-								{
-									bresenham_error-=fast_d;
-								}
-								slow++;
-							}
-							else
-							{
-								if(fast_d>=0)
-								{
-									bresenham_error+=fast_d;
-								}
-								else
-								{
-									bresenham_error-=fast_d;
-								}
-								slow--;
-							}
+						bresenham_error=bresenham_error+fast_cond*fast_d;
+						slow=slow-slow_cond;
 					}
-					//fast x
-					if(bresenham_dx*bresenham_dx>=bresenham_dy*bresenham_dy)
-					{
-						draw_pixel(fast, slow, r, g, b);
-					}
-					//fast y
-					if(bresenham_dx*bresenham_dx<bresenham_dy*bresenham_dy)
-					{
-						draw_pixel(slow, fast, r, g, b);
-					}
+
+					draw_pixel(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice, r, g, b);
 
 				}
 }
