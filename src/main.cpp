@@ -6,7 +6,7 @@
 #include "ssr.hpp"
 
 #include <ctime>
-#define reps 1000
+#define reps 1
 
 int main()
 {
@@ -21,7 +21,7 @@ int main()
 		ssr::vertex vertex3={0.9,0.5,1,255,255,255};
 
 
-		for(float i=0; i<30; i=i+1)
+		for(float i=0; i<10; i=i+0.001)
 		{
 					vertex2={0.2*cos(i)+0.5, 0.2*(float)sin(i)+0.5, 1, 255, 255, 255};
 
@@ -34,7 +34,7 @@ int main()
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 
-					//renderer.clear(0,0,0);
+					renderer.clear(0,0,0);
 		}
 
 	}
