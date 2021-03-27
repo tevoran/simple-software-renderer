@@ -34,7 +34,7 @@ int main()
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 
-					renderer.clear(0,0,0);
+					renderer.clear();
 		}
 
 	}

@@ -47,7 +47,7 @@ namespace ssr
 
 		public:
 			renderer();
-			void clear(uint8_t r, uint8_t g, uint8_t b);
+			void clear();
 			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3);
 

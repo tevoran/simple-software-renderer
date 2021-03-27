@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <iostream>
 #include <math.h>
+#include <stdio.h>
 #include <exception>
 
 ssr::renderer::renderer()
@@ -71,18 +72,15 @@ ssr::renderer::renderer()
 
 }
 
-void ssr::renderer::clear(uint8_t r, uint8_t g, uint8_t b)
+//clears the background to black
+void ssr::renderer::clear()
 {
 	//RGB pixel format
 	//highest byte is red, lowest byte is blue
 	if(pixel_type == SDL_PIXELFORMAT_RGB888)
 	{
-		uint32_t clear_color = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
-		uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-		for(int i=0; i<(backbuffer->w*backbuffer->h); i++)
-		{
-			pixel_ptr[i]=clear_color;
-		}
+		void *pixel_ptr = static_cast<void*>(backbuffer->pixels);
+		memset(pixel_ptr, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
 	}
 	else
 	{
