@@ -97,7 +97,7 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 		//highest byte is red, lowest byte is blue
 		if(pixel_type == SDL_PIXELFORMAT_RGB888)
 		{
-				uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+				static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
 				uint32_t pixel_colored = SDL_MapRGB(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888), r, g, b);
 				pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
 		}

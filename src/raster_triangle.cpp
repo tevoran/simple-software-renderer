@@ -7,6 +7,7 @@
 #include <iostream>
 #include <math.h>
 #include <exception>
+#include <algorithm>
 
 //bresenham algorithm implementation
 void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b)
@@ -106,6 +107,25 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 //the second line
 void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3)
 {
+	//sorting vertices from lowest y-value to highest
+	if(vertex1.y>vertex2.y)
+	{
+		std::swap(vertex1, vertex2);
+	}
+	if(vertex2.y>vertex3.y)
+	{
+		std::swap(vertex2, vertex3);
+	}
+	if(vertex1.y>vertex2.y)
+	{
+		std::swap(vertex1, vertex2);
+	}
+
+	std::cout << "vertex1: y:" << vertex1.y << std::endl;
+	std::cout << "vertex2: y:" << vertex2.y << std::endl;
+	std::cout << "vertex3: y:" << vertex3.y << std::endl;
+
+
 	//line vertex1-vertex2
 	//initializing variables
 	int32_t bresenham_x=(float)vertex1.x*backbuffer->w;
@@ -197,9 +217,8 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 						slow=slow-slow_cond;
 					}
 
-						glm::ivec2 start=glm::ivec2(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice);
-						//glm::ivec2 end=glm::ivec2(vertex3.y*backbuffer->w, vertex3.y*backbuffer->h);
-						raster_line(start, vertex3_draw, 255, 255, 255);
+					glm::ivec2 start=glm::ivec2(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice);
+					raster_line(start, vertex3_draw, 255, 255, 255);
 
 				}
 }
