@@ -114,17 +114,7 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 {
 	//counting the rendered vertices
 	static unsigned int num_vertices = 0;
-
-	//show vertex data
-	/*num_vertices++;
-	std::cout << "render vertex " << num_vertices << std::endl;
-	std::cout << "location: " << vertex1.x << " " << vertex1.y << " " << vertex1.z << std::endl;
-	std::cout << "color: " << (int)vertex1.r << " " << (int)vertex1.g << " " << (int)vertex1.b << std::endl;
-
-	num_vertices++;
-	std::cout << "render vertex " << num_vertices << std::endl;
-	std::cout << "location: " << vertex2.x << " " << vertex2.y << " " << vertex2.z << std::endl;
-	std::cout << "color: " << (int)vertex2.r << " " << (int)vertex2.g << " " << (int)vertex2.b << std::endl;*/
+	
 
 	raster_triangle(vertex1, vertex2, vertex3, flags);
 
@@ -133,13 +123,8 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 
 
 	//vertex transformation aka vertex shader
-	glm::vec4 vex={vertex1.x, vertex1.y, vertex1.z, 0};
+	//glm::vec4 vex={vertex1.x, vertex1.y, vertex1.z, 0};
 
-
-	//rasterization of the pixel
-	int32_t x,y;
-	x=(float)vex.x*(backbuffer->w);
-	y=(float)vex.y*(backbuffer->h);
 
 	//render changed backbuffer onto the screen
 	if(SDL_UpdateWindowSurface(window)!=0)

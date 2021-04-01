@@ -16,26 +16,25 @@ int main()
 		ssr::renderer renderer;
 
 		//test triangle
-		ssr::vertex vertex1={0.0,0.0,1,255,255,255};
+		ssr::vertex vertex1={0.4,0.4,1,255,255,255};
 		ssr::vertex vertex2={1,0.0,1,255,255,255};
-		ssr::vertex vertex3={0.0,1,1,255,255,255};
+		ssr::vertex vertex3={0.4,0.5,1,255,255,255};
 
 
-		for(float i=0; i<10; i=i+0.001)
+		for(float i=0; i<100; i=i+0.0004)
 		{
-					//vertex2={0.2*cos(i)+0.5, 0.5*(float)sin(i)+0.5, 1, 255, 255, 255};
+					vertex2={0.2*cos(i)+0.5, 0.5*(float)sin(i)+0.5, 1, 255, 255, 255};
 
 							std::clock_t clock_begin = std::clock();
 							for(uint32_t i = reps; i > 0; i--)
 							{
-								renderer.render(vertex1, vertex2, vertex3, SSR_WIREFRAME);	
+								renderer.render(vertex1, vertex2, vertex3, SSR_FILL);	
 							}
 							std::clock_t clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 
 					renderer.clear();
-					i=0;
 		}
 
 	}

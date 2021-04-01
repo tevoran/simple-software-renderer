@@ -7,6 +7,7 @@
 
 #define PI 3.1415
 #define SSR_WIREFRAME 0xFFFFFFFE
+#define SSR_FILL 0xFFFFFFFD
 
 
 
