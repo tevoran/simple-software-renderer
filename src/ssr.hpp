@@ -6,6 +6,8 @@
 #include <cstdint>
 
 #define PI 3.1415
+#define SSR_WIREFRAME 0xFFFFFFFE
+
 
 
 namespace ssr
@@ -43,13 +45,13 @@ namespace ssr
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
-			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3);
+			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 		public:
 			renderer();
 			void clear();
 			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
-			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3);
+			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 	};
 }
