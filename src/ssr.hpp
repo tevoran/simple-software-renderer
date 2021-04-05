@@ -10,6 +10,9 @@
 #define SSR_FILL 0xFFFFFFFD
 
 
+#define SSR_TRIANGLE_Y_UPDATE 1
+#define SSR_TRIANGLE_NO_Y_UPDATE 0
+#define SSR_TRIANGLE_INIT 2
 
 namespace ssr
 {
@@ -47,10 +50,41 @@ namespace ssr
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
 			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
+				//uint32_t raster_triangle_line_step(glm::ivec2 start, glm::ivec2 end, uint32_t flags); //the function returns true, if the y-value increases
+
+				class triangle_line_rendering
+				{
+					private:
+						//end points of the line
+						glm::ivec2 start;
+						glm::ivec2 end;
+
+						glm::ivec2 d;
+
+						int32_t t,t_end, t_step, dt; //slow axis
+						int32_t s,s_end, s_step, ds; //fast axis
+
+						bool fast_x;
+
+						int32_t error;
+
+
+						//returns
+						bool y_update_ready=false;
+						bool line_finished=false;
+					public:
+						triangle_line_rendering(glm::ivec2 in_start, glm::ivec2 in_end);
+						void triangle_line_iterate();
+						void show_variables();
+						glm::ivec2 get_location();
+
+						bool line_done();
+						bool y_update();
+				};
 
 		public:
 			renderer();
-			void clear();
+			void update();
 			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 

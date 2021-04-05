@@ -73,8 +73,14 @@ ssr::renderer::renderer()
 }
 
 //clears the background to black
-void ssr::renderer::clear()
+void ssr::renderer::update()
 {
+	//render changed backbuffer onto the screen
+	if(SDL_UpdateWindowSurface(window)!=0)
+	{
+		std::cout << "SDL ERROR MSG: " << std::endl << SDL_GetError() << std::endl;
+	}
+
 	//RGB pixel format
 	//highest byte is red, lowest byte is blue
 	if(pixel_type == SDL_PIXELFORMAT_RGB888)
@@ -125,11 +131,5 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 	//vertex transformation aka vertex shader
 	//glm::vec4 vex={vertex1.x, vertex1.y, vertex1.z, 0};
 
-
-	//render changed backbuffer onto the screen
-	if(SDL_UpdateWindowSurface(window)!=0)
-	{
-		std::cout << "SDL ERROR MSG: " << std::endl << SDL_GetError() << std::endl;
-	}
 	return;	
 }
