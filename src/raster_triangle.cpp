@@ -159,25 +159,44 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		ssr::renderer::triangle_line_rendering line2(vex1, vex2); //line 2 (vex1-2)
 		ssr::renderer::triangle_line_rendering line3(vex2, vex3); //line 3 (vex2-3)
 
-		while(line1.line_done()!=true)
+		do
 		{
-			line1.triangle_line_iterate();
-			draw_pixel(line1.get_location().x, line1.get_location().y,255,255,255);
-			//line1.show_variables();
-			//char n;
-			//std::cin >> n;
-		}
+			if(line1.y_update()!=true)
+			{
+				line1.triangle_line_iterate();
+			}
 
-		while(line2.line_done()!=true)
-		{
-			line2.triangle_line_iterate();
-			draw_pixel(line2.get_location().x, line2.get_location().y,255,255,255);
-		}
+			if(line2.y_update()!=true)
+			{
+				line2.triangle_line_iterate();
+			}
 
-		while(line3.line_done()!=true)
-		{
-			line3.triangle_line_iterate();
-			draw_pixel(line3.get_location().x, line3.get_location().y,255,255,255);
+			if(line3.y_update()!=true)
+			{
+				line3.triangle_line_iterate();
+			}
+
+			//std::cout << line1.y_update() << " " << line2.y_update() << " " << line3.y_update() << std::endl; 
+			//std::cout << line1.get_location().y << std::endl;
+			if(line1.y_update()==true && line2.y_update()==true && line1.get_location().y<=vex2.y)
+			{
+				line1.y_update_processed();
+				line2.y_update_processed();
+				raster_line(line1.get_location(),line2.get_location(), 255, 255, 255);
+			}
+
+			if(line1.y_update()==true && line3.y_update()==true && line1.get_location().y>vex2.y)
+			{
+				line1.y_update_processed();
+				line3.y_update_processed();
+				raster_line(line1.get_location(),line3.get_location(), 255, 255, 255);
+			}
+			if(line1.get_location().y==vex3.y)
+			{
+				break;
+			}
 		}
+		while(1);//!(line1.line_done()==true && line2.line_done()==true && line3.line_done()==true));
+
 	}
 }

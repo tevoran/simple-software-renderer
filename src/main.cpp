@@ -21,7 +21,7 @@ int main()
 		ssr::vertex vertex3={0.3,0.5,1,255,255,255};
 
 
-		for(float i=1.2*PI; i<100; i=i+0.0001)
+		for(float i=1.6*PI; i<100; i=i+0.0001)
 		{
 					vertex2={0.5*cos(i)+0.5, 0.5*(float)sin(i)+0.5, 1, 255, 255, 255};
 
@@ -31,14 +31,6 @@ int main()
 								renderer.render(vertex1, vertex2, vertex3, SSR_FILL);	
 							}
 							std::clock_t clock_end = std::clock();
-							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
-
-							clock_begin = std::clock();
-							for(uint32_t i = reps; i > 0; i--)
-							{
-								renderer.render(vertex1, vertex2, vertex3, SSR_WIREFRAME);	
-							}
-							clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 							renderer.update();

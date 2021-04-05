@@ -79,8 +79,10 @@ void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 	if(s==s_end || line_finished==true)
 	{
 		line_finished=true;
+		y_update_ready=true;
 		return;
 	}
+
 	s+=s_step;
 	if(dt>=0)
 	{
@@ -157,4 +159,9 @@ bool ssr::renderer::triangle_line_rendering::line_done()
 bool ssr::renderer::triangle_line_rendering::y_update()
 {
 	return y_update_ready;
+}
+
+void ssr::renderer::triangle_line_rendering::y_update_processed()
+{
+	y_update_ready=false;
 }
