@@ -18,14 +18,14 @@ int main()
 		ssr::renderer renderer;
 
 		//test triangle
-		ssr::vertex vertex1={0.48,0.48,1,255,255,255};
+		ssr::vertex vertex1={0.1,0.2,1,255,255,255};
 		ssr::vertex vertex2={1,0,1,255,255,255};
-		ssr::vertex vertex3={0.48,0.52,1,255,255,255};
+		ssr::vertex vertex3={0.1,0.8,1,255,255,255};
 
 
 		for(float i=1.6*PI; i<100; i=i+0.01)
 		{
-					vertex2={0.03*cos(i)+0.5, 0.03*(float)sin(i)+0.5, 1, 255, 255, 255};
+					vertex2={0.3*cos(i)+0.5, 0.3*(float)sin(i)+0.5, 1, 255, 255, 255};
 							std::cout << "rendering:" << std::endl;
 							std::clock_t clock_begin = std::clock();
 							for(uint32_t i = reps; i > 0; i--)

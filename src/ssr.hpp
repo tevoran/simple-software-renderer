@@ -50,7 +50,6 @@ namespace ssr
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
 			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
-				//uint32_t raster_triangle_line_step(glm::ivec2 start, glm::ivec2 end, uint32_t flags); //the function returns true, if the y-value increases
 
 				class triangle_line_rendering
 				{
@@ -85,8 +84,9 @@ namespace ssr
 
 		public:
 			renderer();
+			~renderer();
 			void update();
-			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
+			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, float z);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 	};

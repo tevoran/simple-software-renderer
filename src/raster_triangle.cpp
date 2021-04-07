@@ -21,7 +21,7 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 	int32_t bresenham_endy=end.y;
 
 	//first pixel
-	draw_pixel(start.x, start.y, r, g, b);
+	draw_pixel(start.x, start.y, r, g, b, 0);
 
 
 	//regular cases
@@ -96,7 +96,7 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 						slow=slow-slow_cond;
 					}
 
-					draw_pixel(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice, r, g, b);
+					draw_pixel(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice, r, g, b, 0);
 
 				}
 }
@@ -120,10 +120,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 	{
 		std::swap(vertex1, vertex2);
 	}
-
-	//std::cout << "vertex1: y:" << vertex1.y << std::endl;
-	//std::cout << "vertex2: y:" << vertex2.y << std::endl;
-	//std::cout << "vertex3: y:" << vertex3.y << std::endl;
 
 
 	//initializing necessary render variables
@@ -176,8 +172,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				line3.triangle_line_iterate();
 			}
 
-			//std::cout << line1.y_update() << " " << line2.y_update() << " " << line3.y_update() << std::endl; 
-			//std::cout << line1.get_location().y << std::endl;
 			if(line1.y_update()==true && line2.y_update()==true && line1.get_location().y<=vex2.y)
 			{
 				line1.y_update_processed();
@@ -191,12 +185,8 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				line3.y_update_processed();
 				raster_line(line1.get_location(),line3.get_location(), 255, 255, 255);
 			}
-			if(line1.get_location().y==vex3.y)
-			{
-				break;
-			}
 		}
-		while(1);//!(line1.line_done()==true && line2.line_done()==true && line3.line_done()==true));
+		while(line1.get_location().y!=vex3.y);//!(line1.line_done()==true && line2.line_done()==true && line3.line_done()==true));
 
 	}
 }

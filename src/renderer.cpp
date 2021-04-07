@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <exception>
 
+#define max_z_value 1
+
 ssr::renderer::renderer()
 {
 	//SDL INIT
@@ -49,6 +51,11 @@ ssr::renderer::renderer()
 		//Z-Buffer initialization
 		z_buffer=new float[backbuffer->w * backbuffer->h];
 
+		for(int i=0; i<backbuffer->w*backbuffer->w; i++)
+		{
+			z_buffer[i]=max_z_value;
+		}
+
 		//Projection matrix
 		perspective_mat[0].x=tan(0.5*PI-0.5*fov);
 		perspective_mat[0].y=0;
@@ -72,6 +79,11 @@ ssr::renderer::renderer()
 
 }
 
+ssr::renderer::~renderer()
+{
+	delete [] z_buffer;
+}
+
 //clears the background to black
 void ssr::renderer::update()
 {
@@ -81,6 +93,7 @@ void ssr::renderer::update()
 		std::cout << "SDL ERROR MSG: " << std::endl << SDL_GetError() << std::endl;
 	}
 
+	//clearing screen
 	//RGB pixel format
 	//highest byte is red, lowest byte is blue
 	if(pixel_type == SDL_PIXELFORMAT_RGB888)
@@ -93,9 +106,15 @@ void ssr::renderer::update()
 		throw "SDL: unknown pixel format and cannot clear the screen";
 	}
 
+	//clearing z-buffer
+	for(int i=0; i<backbuffer->w*backbuffer->w; i++)
+	{
+		z_buffer[i]=max_z_value;
+	}
+
 }
 
-void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, float z)
 {
 	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h))
 	{
@@ -103,6 +122,8 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 		//highest byte is red, lowest byte is blue
 		if(pixel_type == SDL_PIXELFORMAT_RGB888)
 		{
+			if(z<z_buffer[y*backbuffer->w+x])
+			{
 				static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
 				uint32_t pixel_colored=r;
 				pixel_colored=pixel_colored<<8;
@@ -110,6 +131,9 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 				pixel_colored=pixel_colored<<8;
 				pixel_colored+=b;
 				pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
+
+				z_buffer[y*backbuffer->w+x]=z;
+			}
 		}
 		else
 		{
