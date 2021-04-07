@@ -8,6 +8,8 @@
 #include <ctime>
 #define reps 1000
 
+#define reps2 100000000
+
 int main()
 {
 	try
@@ -16,15 +18,15 @@ int main()
 		ssr::renderer renderer;
 
 		//test triangle
-		ssr::vertex vertex1={0.3,0.3,1,255,255,255};
+		ssr::vertex vertex1={0.48,0.48,1,255,255,255};
 		ssr::vertex vertex2={1,0,1,255,255,255};
-		ssr::vertex vertex3={0.3,0.5,1,255,255,255};
+		ssr::vertex vertex3={0.48,0.52,1,255,255,255};
 
 
-		for(float i=1.6*PI; i<100; i=i+0.0001)
+		for(float i=1.6*PI; i<100; i=i+0.01)
 		{
-					vertex2={0.5*cos(i)+0.5, 0.5*(float)sin(i)+0.5, 1, 255, 255, 255};
-
+					vertex2={0.03*cos(i)+0.5, 0.03*(float)sin(i)+0.5, 1, 255, 255, 255};
+							std::cout << "rendering:" << std::endl;
 							std::clock_t clock_begin = std::clock();
 							for(uint32_t i = reps; i > 0; i--)
 							{
@@ -33,8 +35,10 @@ int main()
 							std::clock_t clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
+
+
 							renderer.update();
-							//SDL_Delay(100000);
+							//SDL_Delay(10000);
 
 		}
 
