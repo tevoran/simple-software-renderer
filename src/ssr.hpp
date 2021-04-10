@@ -6,6 +6,9 @@
 #include <cstdint>
 
 #define PI 3.1415
+
+#define SSR_Z_BUFFER_RES 0x00000FFF
+
 #define SSR_WIREFRAME 0xFFFFFFFE
 #define SSR_FILL 0xFFFFFFFD
 
@@ -45,7 +48,7 @@ namespace ssr
 
 			glm::mat4 perspective_mat; //set in constructor
 
-			float *z_buffer = NULL; //set in constructor
+			int32_t *z_buffer = NULL; //set in constructor
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
@@ -82,11 +85,16 @@ namespace ssr
 						void y_update_processed();
 				};
 
+			int32_t get_z(int32_t a, int32_t b, int32_t d, uint32_t x, uint32_t y) //coordinate form of plain has to be already divided by c
+				{
+					return -a*x-b*y-d;
+				};
+
 		public:
 			renderer();
 			~renderer();
 			void update();
-			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, float z);
+			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 	};

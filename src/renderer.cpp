@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <exception>
 
-#define max_z_value 1
 
 ssr::renderer::renderer()
 {
@@ -49,11 +48,11 @@ ssr::renderer::renderer()
 
 	//renderer initialization
 		//Z-Buffer initialization
-		z_buffer=new float[backbuffer->w * backbuffer->h];
+		z_buffer=new int32_t[backbuffer->w * backbuffer->h];
 
 		for(int i=0; i<backbuffer->w*backbuffer->w; i++)
 		{
-			z_buffer[i]=max_z_value;
+			z_buffer[i]=SSR_Z_BUFFER_RES;
 		}
 
 		//Projection matrix
@@ -109,12 +108,12 @@ void ssr::renderer::update()
 	//clearing z-buffer
 	for(int i=0; i<backbuffer->w*backbuffer->w; i++)
 	{
-		z_buffer[i]=max_z_value;
+		z_buffer[i]=SSR_Z_BUFFER_RES;
 	}
 
 }
 
-void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, float z)
+void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z)
 {
 	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h))
 	{
@@ -150,6 +149,7 @@ void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex
 	static unsigned int num_vertices = 0;
 	
 
+	//rasterization
 	raster_triangle(vertex1, vertex2, vertex3, flags);
 
 

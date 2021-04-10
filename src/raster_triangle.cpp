@@ -121,39 +121,58 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		std::swap(vertex1, vertex2);
 	}
 
-
 	//initializing necessary render variables
-	int32_t vertex1_render_x=(float)vertex1.x*backbuffer->w;
-	int32_t vertex1_render_y=(float)vertex1.y*backbuffer->h;
-
-	int32_t vertex2_render_x=(float)vertex2.x*backbuffer->w;
-	int32_t vertex2_render_y=(float)vertex2.y*backbuffer->h;
-
-	int32_t vertex3_render_x=(float)vertex3.x*backbuffer->w;
-	int32_t vertex3_render_y=(float)vertex3.y*backbuffer->h;
-
-	glm::ivec2 vex1=glm::ivec2(vertex1_render_x, vertex1_render_y);
-	glm::ivec2 vex2=glm::ivec2(vertex2_render_x, vertex2_render_y);
-	glm::ivec2 vex3=glm::ivec2(vertex3_render_x, vertex3_render_y);
+	glm::ivec3 vex1=glm::ivec3((float)vertex1.x*backbuffer->w, (float)vertex1.y*backbuffer->h, (float)vertex1.z*SSR_Z_BUFFER_RES);
+	glm::ivec3 vex2=glm::ivec3((float)vertex2.x*backbuffer->w, (float)vertex2.y*backbuffer->h, (float)vertex2.z*SSR_Z_BUFFER_RES);
+	glm::ivec3 vex3=glm::ivec3((float)vertex3.x*backbuffer->w, (float)vertex3.y*backbuffer->h, (float)vertex3.z*SSR_Z_BUFFER_RES);
 
 
+		if(vex1.z>SSR_Z_BUFFER_RES && vex2.z>SSR_Z_BUFFER_RES && vex3.z>SSR_Z_BUFFER_RES)
+		{
+			return;
+		}
+
+		if(vex1.z<0 && vex2.z<0 && vex3.z<0)
+		{
+			return;
+		}
+
+		//calculating plain normal and stuff for z-buffering
+			//base vector is vex1
+			glm::vec3 u=glm::vec3(vex2-vex1);
+			glm::vec3 v=glm::vec3(vex3-vex1);
+			glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
+
+/*std::cout << "vec u: " << (int)u.x << "x" << (int)u.y << "x" << (int)u.z << std::endl;
+std::cout << "vec v: " << (int)v.x << "x" << (int)v.y << "x" << (int)v.z << std::endl;
+std::cout << "vec n: " << (int)n.x << "x" << (int)n.y << "x" << (int)n.z << std::endl;
+SDL_Delay(5000);*/
+			int32_t c=n.z;
+			int32_t a=n.x/c;
+			int32_t b=n.y/c;
+			int32_t d=-n.x*vex1.x-n.y*vex1.y-n.z*vex1.z;
+			d=d/c;
+
+
+	//draw in wireframe mode
 	if(flags==SSR_WIREFRAME)
 	{
 		//drawing in wireframe mode
-		raster_line(vex1, vex2, 255, 255, 255);
-		raster_line(vex1, vex3, 255, 255, 255);
-		raster_line(vex2, vex3, 255, 255, 255);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y), vertex1.r, vertex1.g, vertex1.b);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y), vertex2.r, vertex2.g, vertex2.b);
+		raster_line(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y), vertex3.r, vertex3.g, vertex3.b);
 		return;
 	}
 
+//SDL_Delay(5000);
+
 	//drawing in fill mode
-
-
 	if(flags==SSR_FILL)
 	{
-		ssr::renderer::triangle_line_rendering line1(vex1, vex3); //line 1 (vex1-3)
-		ssr::renderer::triangle_line_rendering line2(vex1, vex2); //line 2 (vex1-2)
-		ssr::renderer::triangle_line_rendering line3(vex2, vex3); //line 3 (vex2-3)
+		ssr::renderer::triangle_line_rendering line1(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y)); //line 1 (vex1-3)
+		ssr::renderer::triangle_line_rendering line2(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y)); //line 2 (vex1-2)
+		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
+
 
 		do
 		{
@@ -172,18 +191,32 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				line3.triangle_line_iterate();
 			}
 
+			//draw upper part of the triangle
 			if(line1.y_update()==true && line2.y_update()==true && line1.get_location().y<=vex2.y)
 			{
 				line1.y_update_processed();
 				line2.y_update_processed();
-				raster_line(line1.get_location(),line2.get_location(), 255, 255, 255);
+				uint32_t y=line1.get_location().y;
+				for(uint32_t x=line1.get_location().x ; x<=line2.get_location().x ; x++)
+				{
+					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, get_z(a, b, d, x, y));
+				}
+				//raster_line(line1.get_location(),line2.get_location(), 20, 100, 0);
 			}
 
+			//draw lower half of the triangle
 			if(line1.y_update()==true && line3.y_update()==true && line1.get_location().y>vex2.y)
 			{
 				line1.y_update_processed();
 				line3.y_update_processed();
-				raster_line(line1.get_location(),line3.get_location(), 255, 255, 255);
+				uint32_t y=line1.get_location().y;
+				for(uint32_t x=line1.get_location().x ; x<=line3.get_location().x ; x++)
+				{
+					//std::cout << "Z: " << get_z(a, b, d, x, y) << std::endl;
+					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, get_z(a, b, d, x, y));
+					//SDL_Delay(3000);
+				}
+				//raster_line(line1.get_location(),line3.get_location(), 20, 100, 0);
 			}
 		}
 		while(line1.get_location().y!=vex3.y);//!(line1.line_done()==true && line2.line_done()==true && line3.line_done()==true));
