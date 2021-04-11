@@ -194,9 +194,13 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				line1.y_update_processed();
 				line2.y_update_processed();
 				y++;
-				for(uint32_t x=line1.get_x() ; x<=line2.get_x() ; x++)
+				int32_t x0=line1.get_x();
+				int32_t z=get_z(a, b, d, x0-1, y);
+				int32_t dz=get_z(a, b, d, x0, y)-z;
+				for(uint32_t x=x0 ; x<=line2.get_x() ; x++)
 				{
-					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, get_z(a, b, d, x, y));
+					z+=dz;
+					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, z);
 				}
 			}
 

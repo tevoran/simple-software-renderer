@@ -31,18 +31,17 @@ int main()
 		{
 					//vertex2={0.3*cos(i)+0.5, 0.3*(float)sin(i)+0.5, 1, 255, 255, 255};
 							std::cout << "rendering:" << std::endl;
-							std::clock_t clock_begin = std::clock();
-								renderer.render(vertex1, vertex2, vertex3, SSR_FILL);
-								renderer.render(vertex4, vertex5, vertex6, SSR_FILL);	
+							std::clock_t clock_begin = std::clock();	
 							for(uint32_t i = reps; i > 0; i--)
 							{
-							renderer.update();
+								renderer.render(vertex1, vertex2, vertex3, SSR_FILL);
+								renderer.render(vertex4, vertex5, vertex6, SSR_FILL);
 							}
 							std::clock_t clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
 
-
+							renderer.update();
 							SDL_Delay(3000);
 							exit(0);
 
