@@ -106,11 +106,7 @@ void ssr::renderer::update()
 	}
 
 	//clearing z-buffer
-	for(int i=0; i<backbuffer->w*backbuffer->w; i++)
-	{
-		z_buffer[i]=SSR_Z_BUFFER_RES;
-	}
-
+	memset(z_buffer, SSR_Z_BUFFER_RES, backbuffer->h*backbuffer->w*sizeof(int32_t));
 }
 
 void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z)
