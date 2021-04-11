@@ -31,6 +31,18 @@ namespace ssr
 		uint8_t b;
 	};
 
+	struct pixel
+	{
+		int32_t x;
+		int32_t y;
+
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+
+		int32_t z;
+	};
+
 	//renderer
 	class renderer
 	{
@@ -48,7 +60,7 @@ namespace ssr
 
 			glm::mat4 perspective_mat; //set in constructor
 
-			int32_t *z_buffer = NULL; //set in constructor
+			uint32_t *z_buffer = NULL; //set in constructor
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
@@ -94,7 +106,8 @@ namespace ssr
 			renderer();
 			~renderer();
 			void update();
-			void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z);
+			void draw_pixel(struct ssr::pixel *data);
+			//void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 	};

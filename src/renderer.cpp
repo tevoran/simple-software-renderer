@@ -48,7 +48,7 @@ ssr::renderer::renderer()
 
 	//renderer initialization
 		//Z-Buffer initialization
-		z_buffer=new int32_t[backbuffer->w * backbuffer->h];
+		z_buffer=new uint32_t[backbuffer->w * backbuffer->h];
 
 		for(int i=0; i<backbuffer->w*backbuffer->w; i++)
 		{
@@ -106,29 +106,31 @@ void ssr::renderer::update()
 	}
 
 	//clearing z-buffer
-	memset(z_buffer, SSR_Z_BUFFER_RES, backbuffer->h*backbuffer->w*sizeof(int32_t));
+	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int32_t));
+	/*for(int i=0; i<backbuffer->w*backbuffer->w; i++)
+	{
+		z_buffer[i]=SSR_Z_BUFFER_RES;
+	}*/
 }
 
-void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z)
+void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 {
-	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h))
+	if(data->x<(backbuffer->w) && data->x>=0 && data->y>=0 && data->y<(backbuffer->h) && data->z<z_buffer[data->y*backbuffer->w+data->x])
 	{
 		//RGB pixel format
 		//highest byte is red, lowest byte is blue
 		if(pixel_type == SDL_PIXELFORMAT_RGB888)
 		{
-			if(z<z_buffer[y*backbuffer->w+x])
-			{
-				static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-				uint32_t pixel_colored=r;
-				pixel_colored=pixel_colored<<8;
-				pixel_colored+=g;
-				pixel_colored=pixel_colored<<8;
-				pixel_colored+=b;
-				pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
+			static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+			uint32_t pixel_colored=data->r;
+			pixel_colored=pixel_colored<<8;
+			pixel_colored+=data->g;
+			pixel_colored=pixel_colored<<8;
+			pixel_colored+=data->b;
+			pixel_ptr[data->x+data->y*(backbuffer->w)]=pixel_colored;
 
-				z_buffer[y*backbuffer->w+x]=z;
-			}
+			z_buffer[data->y*backbuffer->w+data->x]=data->z;
+
 		}
 		else
 		{
@@ -136,6 +138,32 @@ void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, in
 		}
 	}
 }
+
+/*void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z)
+{
+	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h) && z<z_buffer[y*backbuffer->w+x])
+	{
+		//RGB pixel format
+		//highest byte is red, lowest byte is blue
+		if(pixel_type == SDL_PIXELFORMAT_RGB888)
+		{
+			static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+			uint32_t pixel_colored=r;
+			pixel_colored=pixel_colored<<8;
+			pixel_colored+=g;
+			pixel_colored=pixel_colored<<8;
+			pixel_colored+=b;
+			pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
+
+			z_buffer[y*backbuffer->w+x]=z;
+
+		}
+		else
+		{
+			throw "SDL: unknown pixel format and cannot draw a pixel";
+		}
+	}
+}*/
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/

@@ -21,8 +21,14 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 	int32_t bresenham_endy=end.y;
 
 	//first pixel
-	draw_pixel(start.x, start.y, r, g, b, 0);
-
+	struct ssr::pixel pixel;
+	pixel.x=start.x;
+	pixel.y=start.y;
+	pixel.r=r;
+	pixel.g=g;
+	pixel.b=b;
+	pixel.z=0;
+	draw_pixel(&pixel);
 
 	//regular cases
 		int32_t fast;
@@ -95,8 +101,9 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 						bresenham_error=bresenham_error+fast_cond*fast_d;
 						slow=slow-slow_cond;
 					}
-
-					draw_pixel(fast*fast_x_choice+slow*fast_y_choice, slow*fast_x_choice+fast*fast_y_choice, r, g, b, 0);
+					pixel.x=fast*fast_x_choice+slow*fast_y_choice;
+					pixel.y=slow*fast_x_choice+fast*fast_y_choice;
+					draw_pixel(&pixel);
 
 				}
 }
@@ -170,17 +177,27 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		ssr::renderer::triangle_line_rendering line2(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y)); //line 2 (vex1-2)
 		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
 
-		int32_t y=vex1.y;
+		struct ssr::pixel pixel;
+		pixel.r=vertex1.r;
+		pixel.g=vertex1.g;
+		pixel.b=vertex1.b;
+		pixel.y=vex1.y;
+
+		//bool line_x_direction=true; //vertex x-value is bigger than 
 		do
 		{
 			if(line1.y_update()!=true)
 			{
 				line1.triangle_line_iterate();
+				pixel.x=line1.get_x();
+				pixel.y++;
+				pixel.z=get_z(a, b, d, pixel.x, pixel.y);
 			}
 
 			if(line2.y_update()!=true)
 			{
 				line2.triangle_line_iterate();
+
 			}
 
 			if(line3.y_update()!=true)
@@ -189,37 +206,37 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			}
 
 			//draw upper part of the triangle
-			if(line1.y_update()==true && line2.y_update()==true && y<vex2.y)
+			if(line1.y_update()==true && line2.y_update()==true && pixel.y<vex2.y)
 			{
 				line1.y_update_processed();
 				line2.y_update_processed();
-				y++;
-				int32_t x0=line1.get_x();
-				int32_t z=get_z(a, b, d, x0-1, y);
-				int32_t dz=get_z(a, b, d, x0, y)-z;
-				for(uint32_t x=x0 ; x<=line2.get_x() ; x++)
+				int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+				int32_t x_end=line2.get_x();
+				do
 				{
-					z+=dz;
-					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, z);
+					pixel.z+=dz;
+					pixel.x++;
+					draw_pixel(&pixel);
 				}
+				while(pixel.x<=x_end);
 			}
 
 			//draw lower half of the triangle
-			if(line1.y_update()==true && line3.y_update()==true && y>=vex2.y)
+			if(line1.y_update()==true && line3.y_update()==true && pixel.y>=vex2.y)
 			{
 				line1.y_update_processed();
 				line3.y_update_processed();
-				y++;
-				int32_t x0=line1.get_x();
-				int32_t z=get_z(a, b, d, x0-1, y);
-				int32_t dz=get_z(a, b, d, x0, y)-z;
-				for(uint32_t x=x0 ; x<=line3.get_x() ; x++)
+				int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+				int32_t x_end=line3.get_x();
+				do
 				{
-					z+=dz;
-					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, z);
+					pixel.z+=dz;
+					pixel.x++;
+					draw_pixel(&pixel);
 				}
+				while(pixel.x<=x_end);
 			}
 		}
-		while(y!=vex3.y);
+		while(pixel.y!=vex3.y);
 	}
 }
