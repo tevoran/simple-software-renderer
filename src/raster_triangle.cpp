@@ -143,10 +143,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			glm::vec3 v=glm::vec3(vex3-vex1);
 			glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
 
-/*std::cout << "vec u: " << (int)u.x << "x" << (int)u.y << "x" << (int)u.z << std::endl;
-std::cout << "vec v: " << (int)v.x << "x" << (int)v.y << "x" << (int)v.z << std::endl;
-std::cout << "vec n: " << (int)n.x << "x" << (int)n.y << "x" << (int)n.z << std::endl;
-SDL_Delay(5000);*/
+			
 			int32_t c=n.z;
 			int32_t a=n.x/c;
 			int32_t b=n.y/c;
@@ -173,7 +170,7 @@ SDL_Delay(5000);*/
 		ssr::renderer::triangle_line_rendering line2(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y)); //line 2 (vex1-2)
 		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
 
-
+		int32_t y=vex1.y;
 		do
 		{
 			if(line1.y_update()!=true)
@@ -192,34 +189,33 @@ SDL_Delay(5000);*/
 			}
 
 			//draw upper part of the triangle
-			if(line1.y_update()==true && line2.y_update()==true && line1.get_location().y<=vex2.y)
+			if(line1.y_update()==true && line2.y_update()==true && y<vex2.y)
 			{
 				line1.y_update_processed();
 				line2.y_update_processed();
-				uint32_t y=line1.get_location().y;
-				for(uint32_t x=line1.get_location().x ; x<=line2.get_location().x ; x++)
+				y++;
+				for(uint32_t x=line1.get_x() ; x<=line2.get_x() ; x++)
 				{
 					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, get_z(a, b, d, x, y));
 				}
-				//raster_line(line1.get_location(),line2.get_location(), 20, 100, 0);
 			}
 
 			//draw lower half of the triangle
-			if(line1.y_update()==true && line3.y_update()==true && line1.get_location().y>vex2.y)
+			if(line1.y_update()==true && line3.y_update()==true && y>=vex2.y)
 			{
 				line1.y_update_processed();
 				line3.y_update_processed();
-				uint32_t y=line1.get_location().y;
-				for(uint32_t x=line1.get_location().x ; x<=line3.get_location().x ; x++)
+				y++;
+				int32_t x0=line1.get_x();
+				int32_t z=get_z(a, b, d, x0-1, y);
+				int32_t dz=get_z(a, b, d, x0, y)-z;
+				for(uint32_t x=x0 ; x<=line3.get_x() ; x++)
 				{
-					//std::cout << "Z: " << get_z(a, b, d, x, y) << std::endl;
-					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, get_z(a, b, d, x, y));
-					//SDL_Delay(3000);
+					z+=dz;
+					draw_pixel(x, y, vertex1.r, vertex1.g, vertex1.b, z);
 				}
-				//raster_line(line1.get_location(),line3.get_location(), 20, 100, 0);
 			}
 		}
-		while(line1.get_location().y!=vex3.y);//!(line1.line_done()==true && line2.line_done()==true && line3.line_done()==true));
-
+		while(y!=vex3.y);
 	}
 }

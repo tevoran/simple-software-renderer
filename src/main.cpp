@@ -6,7 +6,7 @@
 #include "ssr.hpp"
 
 #include <ctime>
-#define reps 1
+#define reps 100
 
 #define reps2 100000000
 
@@ -25,9 +25,9 @@ int main()
 		//second test triangle
 		ssr::vertex vertex4={0.0,	0.0,	0.8,	200,200,2};
 		ssr::vertex vertex5={0.7,	1,		0.01,	200,200,2};
-		ssr::vertex vertex6={1.1,		0.1,	0.8,	200,200,2};
+		ssr::vertex vertex6={1.1,	0.1,	0.8,	200,200,2};
 
-		for(float i=1.6*PI; i<100; i=i+0.01)
+		for(float i=1.6*PI; i<100; i=i+1)
 		{
 					//vertex2={0.3*cos(i)+0.5, 0.3*(float)sin(i)+0.5, 1, 255, 255, 255};
 							std::cout << "rendering:" << std::endl;
@@ -43,7 +43,8 @@ int main()
 
 
 							renderer.update();
-							//SDL_Delay(10000);
+							SDL_Delay(3000);
+							exit(0);
 
 		}
 

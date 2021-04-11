@@ -118,17 +118,9 @@ void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 	}
 }
 
-glm::ivec2 ssr::renderer::triangle_line_rendering::get_location()
+uint32_t ssr::renderer::triangle_line_rendering::get_x()
 {
-	glm::ivec2 out;
-	if(fast_x==true)
-	{
-		out=glm::ivec2(s,t);
-	}
-	else
-	{
-		out=glm::ivec2(t,s);
-	}
+	uint32_t out=fast_x*s+(!fast_x*t);
 	return out;
 }
 

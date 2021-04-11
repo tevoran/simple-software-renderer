@@ -78,7 +78,7 @@ namespace ssr
 						triangle_line_rendering(glm::ivec2 in_start, glm::ivec2 in_end);
 						void triangle_line_iterate();
 						void show_variables();
-						glm::ivec2 get_location();
+						uint32_t get_x();
 
 						bool line_done();
 						bool y_update();
