@@ -50,10 +50,9 @@ ssr::renderer::renderer()
 		//Z-Buffer initialization
 		z_buffer=new uint32_t[backbuffer->w * backbuffer->h];
 
-		for(int i=0; i<backbuffer->w*backbuffer->w; i++)
-		{
-			z_buffer[i]=SSR_Z_BUFFER_RES;
-		}
+		std::cout << "Resolution: " << backbuffer->w << "x" << backbuffer->h << std::endl;
+		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int32_t));
+
 
 		//Projection matrix
 		perspective_mat[0].x=tan(0.5*PI-0.5*fov);
@@ -107,10 +106,7 @@ void ssr::renderer::update()
 
 	//clearing z-buffer
 	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int32_t));
-	/*for(int i=0; i<backbuffer->w*backbuffer->w; i++)
-	{
-		z_buffer[i]=SSR_Z_BUFFER_RES;
-	}*/
+
 }
 
 void ssr::renderer::draw_pixel(struct ssr::pixel *data)
@@ -139,31 +135,6 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 	}
 }
 
-/*void ssr::renderer::draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z)
-{
-	if(x<(backbuffer->w) && x>=0 && y>=0 && y<(backbuffer->h) && z<z_buffer[y*backbuffer->w+x])
-	{
-		//RGB pixel format
-		//highest byte is red, lowest byte is blue
-		if(pixel_type == SDL_PIXELFORMAT_RGB888)
-		{
-			static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-			uint32_t pixel_colored=r;
-			pixel_colored=pixel_colored<<8;
-			pixel_colored+=g;
-			pixel_colored=pixel_colored<<8;
-			pixel_colored+=b;
-			pixel_ptr[x+y*(backbuffer->w)]=pixel_colored;
-
-			z_buffer[y*backbuffer->w+x]=z;
-
-		}
-		else
-		{
-			throw "SDL: unknown pixel format and cannot draw a pixel";
-		}
-	}
-}*/
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
