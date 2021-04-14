@@ -7,7 +7,8 @@
 
 #define PI 3.1415
 
-#define SSR_Z_BUFFER_RES 0x00000FFF
+#define SSR_Z_BUFFER_RES 0x000008FF
+#define SSR_Z_BUFFER_CLEAR -1
 
 #define SSR_WIREFRAME 0xFFFFFFFE
 #define SSR_FILL 0xFFFFFFFD
@@ -40,14 +41,14 @@ namespace ssr
 		uint8_t g;
 		uint8_t b;
 
-		int32_t z;
+		int64_t z;
 	};
 
 	//renderer
 	class renderer
 	{
 		private:
-			int res_x=800;
+			int res_x=1100;
 			int res_y=800;
 			SDL_Window *window = NULL; //set in constructor
 			SDL_Surface *backbuffer = NULL; //set in constructor
@@ -60,7 +61,7 @@ namespace ssr
 
 			glm::mat4 perspective_mat; //set in constructor
 
-			uint32_t *z_buffer = NULL; //set in constructor
+			int64_t *z_buffer = NULL; //set in constructor
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
@@ -97,7 +98,7 @@ namespace ssr
 						void y_update_processed();
 				};
 
-			int32_t get_z(int32_t a, int32_t b, int32_t d, uint32_t x, uint32_t y) //coordinate form of plain has to be already divided by c
+			int64_t get_z(float a, float b, float d, uint32_t x, uint32_t y) //coordinate form of plain has to be already divided by c
 				{
 					return -a*x-b*y-d;
 				};

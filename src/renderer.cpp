@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <exception>
+#include <limits.h>
 
 
 ssr::renderer::renderer()
@@ -48,10 +49,10 @@ ssr::renderer::renderer()
 
 	//renderer initialization
 		//Z-Buffer initialization
-		z_buffer=new uint32_t[backbuffer->w * backbuffer->h];
+		z_buffer=new int64_t[backbuffer->w * backbuffer->h];
 
 		std::cout << "Resolution: " << backbuffer->w << "x" << backbuffer->h << std::endl;
-		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int32_t));
+		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int64_t));
 
 
 		//Projection matrix
@@ -105,13 +106,18 @@ void ssr::renderer::update()
 	}
 
 	//clearing z-buffer
-	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int32_t));
+	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int64_t)); //setting it to max value
 
 }
 
 void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 {
-	if(data->x<(backbuffer->w) && data->x>=0 && data->y>=0 && data->y<(backbuffer->h) && data->z<z_buffer[data->y*backbuffer->w+data->x])
+	if(
+		data->x<(backbuffer->w) 
+		&& data->x>=0 && data->y>=0
+		&& data->y<(backbuffer->h)
+		&& (data->z<z_buffer[data->y*backbuffer->w+data->x] || z_buffer[data->y*backbuffer->w+data->x]==SSR_Z_BUFFER_CLEAR)
+		)
 	{
 		//RGB pixel format
 		//highest byte is red, lowest byte is blue

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <exception>
 #include <algorithm>
+#include <limits>
 
 //bresenham algorithm implementation
 void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b)
@@ -114,6 +115,12 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 //the second line
 void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags)
 {
+	//end renderering, if vertices are beyond far plane
+	if(vertex1.z>1 && vertex2.z>1 && vertex3.z>1)
+	{
+		return;
+	}
+
 	//sorting vertices from lowest y-value to highest
 	if(vertex1.y>vertex2.y)
 	{
@@ -129,33 +136,31 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 	}
 
 	//initializing necessary render variables
-	glm::ivec3 vex1=glm::ivec3((float)vertex1.x*backbuffer->w, (float)vertex1.y*backbuffer->h, (float)vertex1.z*SSR_Z_BUFFER_RES);
-	glm::ivec3 vex2=glm::ivec3((float)vertex2.x*backbuffer->w, (float)vertex2.y*backbuffer->h, (float)vertex2.z*SSR_Z_BUFFER_RES);
-	glm::ivec3 vex3=glm::ivec3((float)vertex3.x*backbuffer->w, (float)vertex3.y*backbuffer->h, (float)vertex3.z*SSR_Z_BUFFER_RES);
+	glm::ivec3 vex1=glm::ivec3((float)vertex1.x*backbuffer->w, (float)vertex1.y*backbuffer->h, (float)vertex1.z*INT32_MAX);
+	glm::ivec3 vex2=glm::ivec3((float)vertex2.x*backbuffer->w, (float)vertex2.y*backbuffer->h, (float)vertex2.z*INT32_MAX);
+	glm::ivec3 vex3=glm::ivec3((float)vertex3.x*backbuffer->w, (float)vertex3.y*backbuffer->h, (float)vertex3.z*INT32_MAX);
 
+	//end rendering if vertices are behind near plane
+/*	std::cout << "z: " << vex1.z << std::endl;
+	std::cout << "z: " << vex2.z << std::endl;
+	std::cout << "z: " << vex3.z << std::endl << std::endl;*/
 
-		if(vex1.z>SSR_Z_BUFFER_RES && vex2.z>SSR_Z_BUFFER_RES && vex3.z>SSR_Z_BUFFER_RES)
-		{
-			return;
-		}
+	if(vex1.z<0 && vex2.z<0 && vex3.z<0)
+	{
+		return;
+	}
 
-		if(vex1.z<0 && vex2.z<0 && vex3.z<0)
-		{
-			return;
-		}
+	//calculating plain normal and stuff for z-buffering
+		//base vector is vex1
+		glm::vec3 u=glm::vec3(vex2-vex1);
+		glm::vec3 v=glm::vec3(vex3-vex1);
+		glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
 
-		//calculating plain normal and stuff for z-buffering
-			//base vector is vex1
-			glm::vec3 u=glm::vec3(vex2-vex1);
-			glm::vec3 v=glm::vec3(vex3-vex1);
-			glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
-
-			
-			int32_t c=n.z;
-			int32_t a=n.x/c;
-			int32_t b=n.y/c;
-			int32_t d=-n.x*vex1.x-n.y*vex1.y-n.z*vex1.z;
-			d=d/c;
+		float c=n.z;
+		float a=n.x/c;
+		float b=n.y/c;
+		float d=-n.x*vex1.x-n.y*vex1.y-n.z*vex1.z;
+		d=d/c;
 
 
 	//draw in wireframe mode
@@ -168,7 +173,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		return;
 	}
 
-//SDL_Delay(5000);
 
 	//drawing in fill mode
 	if(flags==SSR_FILL)
@@ -183,7 +187,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		pixel.b=vertex1.b;
 		pixel.y=vex1.y;
 
-		//bool line_x_direction=true; //vertex x-value is bigger than 
+		//upper part of the triangle
 		do
 		{
 			if(line1.y_update()!=true)
@@ -197,16 +201,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			if(line2.y_update()!=true)
 			{
 				line2.triangle_line_iterate();
-
 			}
 
-			if(line3.y_update()!=true)
-			{
-				line3.triangle_line_iterate();
-			}
-
-			//draw upper part of the triangle
-			if(line1.y_update()==true && line2.y_update()==true && pixel.y<vex2.y)
+			if(line1.y_update()==true && line2.y_update()==true)
 			{
 				line1.y_update_processed();
 				line2.y_update_processed();
@@ -220,9 +217,26 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				}
 				while(pixel.x<=x_end);
 			}
+		}
+		while(pixel.y<vex2.y);
+		
+		//lower part of the triangle
+		do
+		{
+			if(line1.y_update()!=true)
+			{
+				line1.triangle_line_iterate();
+				pixel.x=line1.get_x();
+				pixel.y++;
+				pixel.z=get_z(a, b, d, pixel.x, pixel.y);
+			}
 
-			//draw lower half of the triangle
-			if(line1.y_update()==true && line3.y_update()==true && pixel.y>=vex2.y)
+			if(line3.y_update()!=true)
+			{
+				line3.triangle_line_iterate();
+			}
+
+			if(line1.y_update()==true && line3.y_update()==true)
 			{
 				line1.y_update_processed();
 				line3.y_update_processed();
@@ -236,7 +250,8 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 				}
 				while(pixel.x<=x_end);
 			}
+
 		}
-		while(pixel.y!=vex3.y);
+		while(pixel.y<=vex3.y);
 	}
 }
