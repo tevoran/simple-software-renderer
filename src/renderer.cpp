@@ -116,7 +116,7 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 		data->x<(backbuffer->w) 
 		&& data->x>=0 && data->y>=0
 		&& data->y<(backbuffer->h)
-		&& (data->z<z_buffer[data->y*backbuffer->w+data->x] || z_buffer[data->y*backbuffer->w+data->x]==SSR_Z_BUFFER_CLEAR)
+		&& ((data->z*(float)INT32_MAX)<z_buffer[data->y*backbuffer->w+data->x] || z_buffer[data->y*backbuffer->w+data->x]==SSR_Z_BUFFER_CLEAR)
 		)
 	{
 		//RGB pixel format
@@ -131,7 +131,10 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 			pixel_colored+=data->b;
 			pixel_ptr[data->x+data->y*(backbuffer->w)]=pixel_colored;
 
-			z_buffer[data->y*backbuffer->w+data->x]=data->z;
+			//std::cout << "z: " << data->z << std::endl;
+			z_buffer[data->y*backbuffer->w+data->x]=data->z*(float)INT32_MAX;
+			//std::cout << "z_buffer: " << z_buffer[data->y*backbuffer->w+data->x] << std::endl;
+			//std::cout << "z_value: " << data->z << std::endl << std::endl;
 
 		}
 		else

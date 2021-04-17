@@ -41,7 +41,7 @@ namespace ssr
 		uint8_t g;
 		uint8_t b;
 
-		int64_t z;
+		float z;
 	};
 
 	//renderer
@@ -91,7 +91,7 @@ namespace ssr
 						uint32_t get_x();
 				};
 
-			int64_t get_z(float a, float b, float d, uint32_t x, uint32_t y) //coordinate form of plain has to be already divided by c
+			float get_z(float a, float b, float d, float x, float y) //coordinate form of plain has to be already divided by c
 				{
 					return -a*x-b*y-d;
 				};

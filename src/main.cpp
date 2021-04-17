@@ -18,14 +18,14 @@ int main()
 		ssr::renderer renderer;
 
 		//test triangle
-		ssr::vertex vertex1={0.1,	0.2,	0.1,	20,100,0};
-		ssr::vertex vertex2={0.8,	0.2,	0.5,	20,100,0};
-		ssr::vertex vertex3={0.5,	0.8,	0.9,	20,100,0};
+		ssr::vertex vertex1={0.0,	0.2,	0.01,	20,100,0}; //dark green
+		ssr::vertex vertex2={0.8,	0.2,	0.4,	20,100,0};
+		ssr::vertex vertex3={0.7,	0.8,	0.99,	20,100,0};
 
 		//second test triangle
-		ssr::vertex vertex4={0.0,	0.0,	0.8,	200,200,2};
-		ssr::vertex vertex5={0.7,	1,		0.01,	200,200,2};
-		ssr::vertex vertex6={1.1,	0.1,	0.8,	200,200,2};
+		ssr::vertex vertex4={0.0,	0.0,	0.6,	200,200,2};// yellow
+		ssr::vertex vertex5={0.7,	1,		0.6,	200,200,2};
+		ssr::vertex vertex6={1.1,	0.1,	0.6,	200,200,2};
 
 		for(float i=1.6*PI; i<100; i=i+1)
 		{

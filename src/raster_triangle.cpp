@@ -135,6 +135,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		std::swap(vertex1, vertex2);
 	}
 
+
 	//initializing necessary render variables
 	glm::ivec3 vex1=glm::ivec3((float)vertex1.x*backbuffer->w, (float)vertex1.y*backbuffer->h, (float)vertex1.z*INT32_MAX);
 	glm::ivec3 vex2=glm::ivec3((float)vertex2.x*backbuffer->w, (float)vertex2.y*backbuffer->h, (float)vertex2.z*INT32_MAX);
@@ -152,16 +153,18 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 
 	//calculating plain normal and stuff for z-buffering
 		//base vector is vex1
-		glm::vec3 u=glm::vec3(vex2-vex1);
-		glm::vec3 v=glm::vec3(vex3-vex1);
+		glm::vec3 u=glm::vec3(vertex2.x-vertex1.x, vertex2.y-vertex1.y, vertex2.z-vertex1.z);
+		glm::vec3 v=glm::vec3(vertex3.x-vertex1.x, vertex3.y-vertex1.y, vertex3.z-vertex1.z);
 		glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
 
 		float c=n.z;
 		float a=n.x/c;
 		float b=n.y/c;
-		float d=-n.x*vex1.x-n.y*vex1.y-n.z*vex1.z;
+		float d=-n.x*vertex1.x-n.y*vertex1.y-n.z*vertex1.z;
 		d=d/c;
 
+		float z_x_increment=1/(float)res_x;
+		float z_y_increment=1/(float)res_y;
 
 	//draw in wireframe mode
 	if(flags==SSR_WIREFRAME)
@@ -193,12 +196,12 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			line1.triangle_line_iterate();
 			pixel.x=line1.get_x();
 			pixel.y++;
-			pixel.z=get_z(a, b, d, pixel.x, pixel.y);
+			pixel.z=get_z(a, b, d, (float)pixel.x/(float)res_x, (float)pixel.y/(float)res_y);
 
 			line2.triangle_line_iterate();
 
 			//draw line
-			int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+			float dz=get_z(a, b, d, (float)pixel.x/(float)res_x+z_x_increment, (float)pixel.y/(float)res_y)-pixel.z;
 			int32_t x_end=line2.get_x();
 			do
 			{
@@ -216,11 +219,12 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			line1.triangle_line_iterate();
 			pixel.x=line1.get_x();
 			pixel.y++;
-			pixel.z=get_z(a, b, d, pixel.x, pixel.y);
+			pixel.z=get_z(a, b, d, (float)pixel.x/(float)res_x, (float)pixel.y/(float)res_y);
+
 
 			line3.triangle_line_iterate();
 
-			int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+			float dz=get_z(a, b, d, (float)pixel.x/(float)res_x+z_x_increment, (float)pixel.y/(float)res_y)-pixel.z;
 			int32_t x_end=line3.get_x();
 			do
 			{
