@@ -135,21 +135,4 @@ void ssr::renderer::triangle_line_rendering::show_variables()
 	std::cout << "ds: " << ds << std::endl;
 	std::cout << "fast_x: " << fast_x << std::endl;
 	std::cout << "error: " << error << std::endl;
-	std::cout << "y_update_ready: " << y_update_ready << std::endl;
-	std::cout << "line_finished: " << line_finished << std::endl;
-}
-
-bool ssr::renderer::triangle_line_rendering::line_done()
-{
-	return line_finished;
-}
-
-bool ssr::renderer::triangle_line_rendering::y_update()
-{
-	return y_update_ready;
-}
-
-void ssr::renderer::triangle_line_rendering::y_update_processed()
-{
-	y_update_ready=false;
 }

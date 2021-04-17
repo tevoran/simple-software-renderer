@@ -84,18 +84,11 @@ namespace ssr
 						int32_t error;
 
 
-						//returns
-						bool y_update_ready=false;
-						bool line_finished=false;
 					public:
 						triangle_line_rendering(glm::ivec2 in_start, glm::ivec2 in_end);
 						void triangle_line_iterate();
 						void show_variables();
 						uint32_t get_x();
-
-						bool line_done();
-						bool y_update();
-						void y_update_processed();
 				};
 
 			int64_t get_z(float a, float b, float d, uint32_t x, uint32_t y) //coordinate form of plain has to be already divided by c
