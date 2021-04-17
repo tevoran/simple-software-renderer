@@ -6,7 +6,7 @@
 #include "ssr.hpp"
 
 #include <ctime>
-#define reps 100
+#define reps 1000
 
 #define reps2 100000000
 

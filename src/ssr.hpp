@@ -48,7 +48,7 @@ namespace ssr
 	class renderer
 	{
 		private:
-			int res_x=1100;
+			int res_x=800;
 			int res_y=800;
 			SDL_Window *window = NULL; //set in constructor
 			SDL_Surface *backbuffer = NULL; //set in constructor

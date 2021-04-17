@@ -190,67 +190,45 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		//upper part of the triangle
 		do
 		{
-			if(line1.y_update()!=true)
-			{
-				line1.triangle_line_iterate();
-				pixel.x=line1.get_x();
-				pixel.y++;
-				pixel.z=get_z(a, b, d, pixel.x, pixel.y);
-			}
+			line1.triangle_line_iterate();
+			pixel.x=line1.get_x();
+			pixel.y++;
+			pixel.z=get_z(a, b, d, pixel.x, pixel.y);
 
-			if(line2.y_update()!=true)
-			{
-				line2.triangle_line_iterate();
-			}
+			line2.triangle_line_iterate();
 
-			if(line1.y_update()==true && line2.y_update()==true)
+			//draw line
+			int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+			int32_t x_end=line2.get_x();
+			do
 			{
-				line1.y_update_processed();
-				line2.y_update_processed();
-				int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
-				int32_t x_end=line2.get_x();
-				do
-				{
-					pixel.z+=dz;
-					pixel.x++;
-					draw_pixel(&pixel);
-				}
-				while(pixel.x<=x_end);
+				pixel.z+=dz;
+				pixel.x++;
+				draw_pixel(&pixel);
 			}
+			while(pixel.x<=x_end);
 		}
 		while(pixel.y<vex2.y);
 		
 		//lower part of the triangle
 		do
 		{
-			if(line1.y_update()!=true)
-			{
-				line1.triangle_line_iterate();
-				pixel.x=line1.get_x();
-				pixel.y++;
-				pixel.z=get_z(a, b, d, pixel.x, pixel.y);
-			}
+			line1.triangle_line_iterate();
+			pixel.x=line1.get_x();
+			pixel.y++;
+			pixel.z=get_z(a, b, d, pixel.x, pixel.y);
 
-			if(line3.y_update()!=true)
-			{
-				line3.triangle_line_iterate();
-			}
+			line3.triangle_line_iterate();
 
-			if(line1.y_update()==true && line3.y_update()==true)
+			int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
+			int32_t x_end=line3.get_x();
+			do
 			{
-				line1.y_update_processed();
-				line3.y_update_processed();
-				int32_t dz=get_z(a, b, d, pixel.x+1, pixel.y)-pixel.z;
-				int32_t x_end=line3.get_x();
-				do
-				{
-					pixel.z+=dz;
-					pixel.x++;
-					draw_pixel(&pixel);
-				}
-				while(pixel.x<=x_end);
+				pixel.z+=dz;
+				pixel.x++;
+				draw_pixel(&pixel);
 			}
-
+			while(pixel.x<=x_end);
 		}
 		while(pixel.y<=vex3.y);
 	}

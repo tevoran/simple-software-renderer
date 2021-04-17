@@ -76,46 +76,42 @@ ssr::renderer::triangle_line_rendering::triangle_line_rendering(glm::ivec2 in_st
 
 void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 {
-	if(s==s_end || line_finished==true)
+	do
 	{
-		line_finished=true;
-		y_update_ready=true;
-		return;
-	}
-
-	s+=s_step;
-	if(dt>=0)
-	{
-		error-=dt;
-	}
-	else
-	{
-		error+=dt;
-	}
-
-	y_update_ready=false;
-	if(fast_x==false)
-	{
-		y_update_ready=true;
-	}
-
-	if(error<=0)
-	{
-		t+=t_step;
-		if(ds>=0)
+		s+=s_step;
+		if(dt>=0)
 		{
-			error+=ds;
+			error-=dt;
 		}
 		else
 		{
-			error-=ds;
+			error+=dt;
 		}
 
-		if(fast_x==true)
+		if(error<=0)
 		{
-			y_update_ready=true;
+			t+=t_step;
+			if(ds>=0)
+			{
+				error+=ds;
+			}
+			else
+			{
+				error-=ds;
+			}
+
+			if(fast_x==true)
+			{
+				break;
+			}
+		}
+
+		if(fast_x==false)
+		{
+			break;
 		}
 	}
+	while(s!=s_end);
 }
 
 uint32_t ssr::renderer::triangle_line_rendering::get_x()
