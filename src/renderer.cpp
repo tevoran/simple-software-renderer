@@ -121,7 +121,8 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 
 	if(
 		data->x<(backbuffer->w) 
-		&& data->x>=0 && data->y>=0
+		&& data->x>=0
+		&& data->y>=0
 		&& data->y<(backbuffer->h)
 		&& data->z<z_buffer[pixel_offset]
 		)
@@ -143,14 +144,22 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
-void ssr::renderer::render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags)
-{
-	//counting the rendered vertices
-	static unsigned int num_vertices = 0;
-	
+void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, uint32_t flags)
+{	
+	static struct vertex *vertex1, *vertex2, *vertex3;
 
-	//rasterization
-	raster_triangle(vertex1, vertex2, vertex3, flags);
+	for(int i=0; i<num_polygons; i++)
+	{
+		//vertex1
+		vertex1=&data[i*3];
+		vertex2=&data[i*3+1];
+		vertex3=&data[i*3+2];
+
+		//rasterization
+		raster_triangle(*vertex1, *vertex2, *vertex3, flags);
+	}
+
+
 
 
 

@@ -100,7 +100,7 @@ namespace ssr
 			~renderer();
 			void update();
 			void draw_pixel(struct ssr::pixel *data);
-			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
+			void render(struct vertex *data, uint32_t num_polygons/*struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3*/, uint32_t flags);
 
 	};
 }
