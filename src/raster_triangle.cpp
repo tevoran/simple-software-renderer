@@ -142,29 +142,24 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 	glm::ivec3 vex3=glm::ivec3((float)vertex3.x*backbuffer->w, (float)vertex3.y*backbuffer->h, (float)vertex3.z*INT32_MAX);
 
 	//end rendering if vertices are behind near plane
-/*	std::cout << "z: " << vex1.z << std::endl;
-	std::cout << "z: " << vex2.z << std::endl;
-	std::cout << "z: " << vex3.z << std::endl << std::endl;*/
-
 	if(vex1.z<0 && vex2.z<0 && vex3.z<0)
 	{
 		return;
 	}
 
-	//calculating plain normal and stuff for z-buffering
-		//base vector is vex1
-		glm::vec3 u=glm::vec3(vertex2.x-vertex1.x, vertex2.y-vertex1.y, vertex2.z-vertex1.z);
-		glm::vec3 v=glm::vec3(vertex3.x-vertex1.x, vertex3.y-vertex1.y, vertex3.z-vertex1.z);
-		glm::vec3 n=glm::vec3(glm::cross(u, v)); //plain normal vector
+	//Z-Buffering stuff
+	int64_t dz_dy=(vex3.z-vex1.z)/(vex3.y-vex1.y);
+	int64_t dz_dx;
 
-		float c=n.z;
-		float a=n.x/c;
-		float b=n.y/c;
-		float d=-n.x*vertex1.x-n.y*vertex1.y-n.z*vertex1.z;
-		d=d/c;
+	if((vex3.x-vex1.x)*(vex3.x-vex1.x)>(vex2.x-vex1.x)*(vex2.x-vex1.x))
+	{
+		dz_dx=(vex3.z-vex1.z)/(vex3.x-vex1.x);
+	}
+	else
+	{
+		dz_dx=(vex2.z-vex1.z)/(vex2.x-vex1.x);
+	}
 
-		float z_x_increment=1/(float)res_x;
-		float z_y_increment=1/(float)res_y;
 
 	//draw in wireframe mode
 	if(flags==SSR_WIREFRAME)
@@ -190,22 +185,24 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		pixel.b=vertex1.b;
 		pixel.y=vex1.y;
 
+		uint64_t z_current_line=vex1.z;
+
 		//upper part of the triangle
 		do
 		{
 			line1.triangle_line_iterate();
 			pixel.x=line1.get_x();
 			pixel.y++;
-			pixel.z=get_z(a, b, d, (float)pixel.x/(float)res_x, (float)pixel.y/(float)res_y);
+			z_current_line+=dz_dy;
 
 			line2.triangle_line_iterate();
 
 			//draw line
-			float dz=get_z(a, b, d, (float)pixel.x/(float)res_x+z_x_increment, (float)pixel.y/(float)res_y)-pixel.z;
 			int32_t x_end=line2.get_x();
+			pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 			do
 			{
-				pixel.z+=dz;
+				pixel.z+=dz_dx;
 				pixel.x++;
 				draw_pixel(&pixel);
 			}
@@ -219,16 +216,16 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			line1.triangle_line_iterate();
 			pixel.x=line1.get_x();
 			pixel.y++;
-			pixel.z=get_z(a, b, d, (float)pixel.x/(float)res_x, (float)pixel.y/(float)res_y);
-
+			z_current_line+=dz_dy;
 
 			line3.triangle_line_iterate();
 
-			float dz=get_z(a, b, d, (float)pixel.x/(float)res_x+z_x_increment, (float)pixel.y/(float)res_y)-pixel.z;
+			//draw line
 			int32_t x_end=line3.get_x();
+			pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 			do
 			{
-				pixel.z+=dz;
+				pixel.z+=dz_dx;
 				pixel.x++;
 				draw_pixel(&pixel);
 			}

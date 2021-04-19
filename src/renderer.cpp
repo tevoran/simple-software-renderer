@@ -49,10 +49,10 @@ ssr::renderer::renderer()
 
 	//renderer initialization
 		//Z-Buffer initialization
-		z_buffer=new int64_t[backbuffer->w * backbuffer->h];
+		z_buffer=new uint64_t[backbuffer->w * backbuffer->h];
 
 		std::cout << "Resolution: " << backbuffer->w << "x" << backbuffer->h << std::endl;
-		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int64_t));
+		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(uint64_t));
 
 
 		//Projection matrix
@@ -111,7 +111,7 @@ void ssr::renderer::update()
 
 
 	//clearing z-buffer
-	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int64_t)); //setting it to max value
+	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(uint64_t)); //setting it to max value
 
 }
 
@@ -123,7 +123,7 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 		data->x<(backbuffer->w) 
 		&& data->x>=0 && data->y>=0
 		&& data->y<(backbuffer->h)
-		&& ((data->z*(float)INT32_MAX)<z_buffer[pixel_offset] || z_buffer[pixel_offset]==SSR_Z_BUFFER_CLEAR)
+		&& data->z<z_buffer[pixel_offset]
 		)
 	{
 
@@ -136,7 +136,7 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 		pixel_colored+=data->b;
 		pixel_ptr[pixel_offset]=pixel_colored;
 
-		z_buffer[pixel_offset]=data->z*(float)INT32_MAX;
+		z_buffer[pixel_offset]=data->z;
 	}
 }
 

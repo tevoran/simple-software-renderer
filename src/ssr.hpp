@@ -41,7 +41,7 @@ namespace ssr
 		uint8_t g;
 		uint8_t b;
 
-		float z;
+		uint64_t z;
 	};
 
 	//renderer
@@ -61,7 +61,7 @@ namespace ssr
 
 			glm::mat4 perspective_mat; //set in constructor
 
-			int64_t *z_buffer = NULL; //set in constructor
+			uint64_t *z_buffer = NULL; //set in constructor
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
@@ -94,17 +94,12 @@ namespace ssr
 						uint32_t get_x();
 				};
 
-			float get_z(float a, float b, float d, float x, float y) //coordinate form of plain has to be already divided by c
-				{
-					return -a*x-b*y-d;
-				};
 
 		public:
 			renderer();
 			~renderer();
 			void update();
 			void draw_pixel(struct ssr::pixel *data);
-			//void draw_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, int32_t z);
 			void render(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
 
 	};
