@@ -79,6 +79,9 @@ namespace ssr
 						int32_t t,t_end, t_step, dt; //slow axis
 						int32_t s,s_end, s_step, ds; //fast axis
 
+						int32_t dt_cond_add; //negative for positve dt;
+						int32_t ds_cond_add; //positive for positve ds;
+
 						bool fast_x;
 
 						int32_t error;

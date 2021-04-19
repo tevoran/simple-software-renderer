@@ -70,7 +70,24 @@ ssr::renderer::triangle_line_rendering::triangle_line_rendering(glm::ivec2 in_st
 		}
 
 	ds=s_end-s;
+	if(ds>=0)
+	{
+		ds_cond_add=ds;
+	}
+	else
+	{
+		ds_cond_add=-ds;
+	}
+
 	dt=t_end-t;
+	if(dt>=0)
+	{
+		dt_cond_add=-dt;
+	}
+	else
+	{
+		dt_cond_add=dt;
+	}
 	error=ds/2;
 }
 
@@ -79,36 +96,22 @@ void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 	do
 	{
 		s+=s_step;
-		if(dt>=0)
-		{
-			error-=dt;
-		}
-		else
-		{
-			error+=dt;
-		}
+		error+=dt_cond_add;
 
 		if(error<=0)
 		{
 			t+=t_step;
-			if(ds>=0)
-			{
-				error+=ds;
-			}
-			else
-			{
-				error-=ds;
-			}
+			error+=ds_cond_add;
 
 			if(fast_x==true)
 			{
-				break;
+				return;
 			}
 		}
 
 		if(fast_x==false)
 		{
-			break;
+			return;
 		}
 	}
 	while(s!=s_end);
