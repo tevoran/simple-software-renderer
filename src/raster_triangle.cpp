@@ -198,15 +198,32 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			line2.triangle_line_iterate();
 
 			//draw line
-			int32_t x_end=line2.get_x();
-			pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
-			do
+			if(pixel.y>=0)
 			{
-				pixel.z+=dz_dx;
-				pixel.x++;
-				draw_pixel(&pixel);
+				int32_t x_end=line2.get_x();
+				if(pixel.x>x_end)
+				{
+					std::swap(pixel.x, x_end);
+				}
+
+				if(x_end>=res_x)
+				{
+					x_end=res_x-1;
+				}
+
+				if(pixel.x<0)
+				{
+					pixel.x=0;
+				}
+				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
+				do
+				{
+					draw_pixel(&pixel);
+					pixel.z+=dz_dx;
+					pixel.x++;
+				}
+				while(pixel.x<=x_end);
 			}
-			while(pixel.x<=x_end);
 		}
 		while(pixel.y<vex2.y);
 		
@@ -221,16 +238,33 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 			line3.triangle_line_iterate();
 
 			//draw line
-			int32_t x_end=line3.get_x();
-			pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
-			do
+			if(pixel.y>=0)
 			{
-				pixel.z+=dz_dx;
-				pixel.x++;
-				draw_pixel(&pixel);
+				int32_t x_end=line3.get_x();
+				if(pixel.x>x_end)
+				{
+					std::swap(pixel.x, x_end);
+				}
+
+				if(x_end>=res_x)
+				{
+					x_end=res_x-1;
+				}
+
+				if(pixel.x<0)
+				{
+					pixel.x=0;
+				}
+				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
+				do
+				{
+					draw_pixel(&pixel);
+					pixel.z+=dz_dx;
+					pixel.x++;
+				}
+				while(pixel.x<=x_end);
 			}
-			while(pixel.x<=x_end);
 		}
-		while(pixel.y<=vex3.y);
+		while(pixel.y<=vex3.y && pixel.y<res_y);
 	}
 }

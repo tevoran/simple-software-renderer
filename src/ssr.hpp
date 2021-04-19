@@ -99,7 +99,7 @@ namespace ssr
 			renderer();
 			~renderer();
 			void update();
-			void draw_pixel(struct ssr::pixel *data);
+			void draw_pixel(struct ssr::pixel *data); //make sure that your pixel is on screen otherwise there is undefined behaviour
 			void render(struct vertex *data, uint32_t num_polygons/*struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3*/, uint32_t flags);
 
 	};

@@ -21,7 +21,7 @@ int main()
 		//test triangle
 		ssr::vertex vertex1={0.0,	0.2,	0.01,	20,100,0}; //dark green
 		ssr::vertex vertex2={0.8,	0.2,	0.4,	20,100,0};
-		ssr::vertex vertex3={0.7,	0.8,	0.99,	20,100,0};
+		ssr::vertex vertex3={0.4,	0.8,	0.99,	20,100,0};
 
 		vertices[0]=vertex1;
 		vertices[1]=vertex2;
@@ -51,7 +51,7 @@ int main()
 							std::clock_t clock_begin = std::clock();	
 							for(uint32_t i = reps; i > 0; i--)
 							{
-								renderer.render(vertices, 3, SSR_FILL);
+								renderer.render(vertices, 2, SSR_FILL);
 								/*	renderer.render(vertex1, vertex2, vertex3, SSR_FILL);
 								renderer.render(vertex4, vertex5, vertex6, SSR_FILL);*/
 							}

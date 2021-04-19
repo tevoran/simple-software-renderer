@@ -115,19 +115,13 @@ void ssr::renderer::update()
 
 }
 
+//make sure your pixel is on screen
 void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 {
 	uint32_t pixel_offset=data->y*backbuffer->w+data->x;
 
-	if(
-		data->x<(backbuffer->w) 
-		&& data->x>=0
-		&& data->y>=0
-		&& data->y<(backbuffer->h)
-		&& data->z<z_buffer[pixel_offset]
-		)
+	if(data->z<z_buffer[pixel_offset])
 	{
-
 		//write in PIXELFORMAT_RGB888
 		static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
 		uint32_t pixel_colored=data->r;
