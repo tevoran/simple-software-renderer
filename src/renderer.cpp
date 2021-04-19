@@ -93,17 +93,22 @@ void ssr::renderer::update()
 	}
 
 	//clearing screen
+	static void *pixel_ptr = static_cast<void*>(backbuffer->pixels);
+	memset(pixel_ptr, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
+
+	//clearing screen
 	//RGB pixel format
 	//highest byte is red, lowest byte is blue
-	if(pixel_type == SDL_PIXELFORMAT_RGB888)
-	{
-		void *pixel_ptr = static_cast<void*>(backbuffer->pixels);
-		memset(pixel_ptr, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
-	}
-	else
+	if(pixel_type != SDL_PIXELFORMAT_RGB888)
 	{
 		throw "SDL: unknown pixel format and cannot clear the screen";
 	}
+	else
+	{
+		//necessary if pixelformat is different, then the renderer needs to rewrite the buffer to
+		//suit the pixelformant
+	}
+
 
 	//clearing z-buffer
 	memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(int64_t)); //setting it to max value
@@ -112,35 +117,26 @@ void ssr::renderer::update()
 
 void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 {
+	uint32_t pixel_offset=data->y*backbuffer->w+data->x;
+
 	if(
 		data->x<(backbuffer->w) 
 		&& data->x>=0 && data->y>=0
 		&& data->y<(backbuffer->h)
-		&& ((data->z*(float)INT32_MAX)<z_buffer[data->y*backbuffer->w+data->x] || z_buffer[data->y*backbuffer->w+data->x]==SSR_Z_BUFFER_CLEAR)
+		&& ((data->z*(float)INT32_MAX)<z_buffer[pixel_offset] || z_buffer[pixel_offset]==SSR_Z_BUFFER_CLEAR)
 		)
 	{
-		//RGB pixel format
-		//highest byte is red, lowest byte is blue
-		if(pixel_type == SDL_PIXELFORMAT_RGB888)
-		{
-			static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-			uint32_t pixel_colored=data->r;
-			pixel_colored=pixel_colored<<8;
-			pixel_colored+=data->g;
-			pixel_colored=pixel_colored<<8;
-			pixel_colored+=data->b;
-			pixel_ptr[data->x+data->y*(backbuffer->w)]=pixel_colored;
 
-			//std::cout << "z: " << data->z << std::endl;
-			z_buffer[data->y*backbuffer->w+data->x]=data->z*(float)INT32_MAX;
-			//std::cout << "z_buffer: " << z_buffer[data->y*backbuffer->w+data->x] << std::endl;
-			//std::cout << "z_value: " << data->z << std::endl << std::endl;
+		//write in PIXELFORMAT_RGB888
+		static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+		uint32_t pixel_colored=data->r;
+		pixel_colored=pixel_colored<<8;
+		pixel_colored+=data->g;
+		pixel_colored=pixel_colored<<8;
+		pixel_colored+=data->b;
+		pixel_ptr[pixel_offset]=pixel_colored;
 
-		}
-		else
-		{
-			throw "SDL: unknown pixel format and cannot draw a pixel";
-		}
+		z_buffer[pixel_offset]=data->z*(float)INT32_MAX;
 	}
 }
 
