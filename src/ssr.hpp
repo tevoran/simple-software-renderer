@@ -65,7 +65,9 @@ namespace ssr
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
-			void raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags);
+			void raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, uint32_t flags);
+
+			void vertex_shader(ssr::vertex *vertex);
 
 				class triangle_line_rendering
 				{
@@ -96,10 +98,11 @@ namespace ssr
 
 
 		public:
-			renderer();
+			renderer(float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip);
 			~renderer();
 			void update();
 			void draw_pixel(struct ssr::pixel *data); //make sure that your pixel is on screen otherwise there is undefined behaviour
+			void draw_next_pixel(uint32_t *pixel_ptr, uint64_t *z_buffer_ptr, struct ssr::pixel *data);
 			void render(struct vertex *data, uint32_t num_polygons/*struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3*/, uint32_t flags);
 
 	};

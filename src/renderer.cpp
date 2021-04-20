@@ -1,6 +1,8 @@
 #include "ssr.hpp"
 
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <SDL2/SDL.h>
 
 #include <cstdint>
@@ -11,7 +13,7 @@
 #include <limits.h>
 
 
-ssr::renderer::renderer()
+ssr::renderer::renderer(float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip)
 {
 	//SDL INIT
 	if(SDL_Init(SDL_INIT_EVERYTHING)==0)
@@ -56,19 +58,20 @@ ssr::renderer::renderer()
 
 
 		//Projection matrix
-		perspective_mat[0].x=tan(0.5*PI-0.5*fov);
+		//perspective_mat=glm::perspective(fov_y, (float)1, near_z_clip, far_z_clip);
+		perspective_mat[0].x=tan(0.5*PI-0.5*fov_y);
 		perspective_mat[0].y=0;
 		perspective_mat[0].z=0;
 		perspective_mat[0].w=0;
 
 		perspective_mat[1].x=0;
-		perspective_mat[1].y=1;
+		perspective_mat[1].y=aspect_ratio*tan(0.5*PI-0.5*fov_y);
 		perspective_mat[1].z=0;
 		perspective_mat[1].w=0;
 
 		perspective_mat[2].x=0;
 		perspective_mat[2].y=0;
-		perspective_mat[2].z=1;
+		perspective_mat[2].z=(1-near_z_clip)/(far_z_clip-near_z_clip);
 		perspective_mat[2].w=0;
 
 		perspective_mat[3].x=0;
@@ -76,6 +79,8 @@ ssr::renderer::renderer()
 		perspective_mat[3].z=0;
 		perspective_mat[3].w=1;
 
+		std::cout << glm::to_string(perspective_mat) << std::endl;
+		SDL_Delay(1000);
 }
 
 ssr::renderer::~renderer()
@@ -135,22 +140,46 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 	}
 }
 
+void ssr::renderer::draw_next_pixel(uint32_t *pixel_ptr, uint64_t *z_buffer_ptr, struct ssr::pixel *data)
+{
+	*pixel_ptr++;
+	*z_buffer_ptr++;
+
+	if(data->z<(*z_buffer_ptr))
+	{
+		//write in PIXELFORMAT_RGB888
+		uint32_t pixel_colored=data->r;
+		pixel_colored=pixel_colored<<8;
+		pixel_colored+=data->g;
+		pixel_colored=pixel_colored<<8;
+		pixel_colored+=data->b;
+		*pixel_ptr=pixel_colored;
+
+		*z_buffer_ptr=data->z;
+	}
+}
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
 void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, uint32_t flags)
 {	
-	static struct vertex *vertex1, *vertex2, *vertex3;
+	static struct vertex vertex1, vertex2, vertex3;
 
 	for(int i=0; i<num_polygons; i++)
 	{
 		//vertex1
-		vertex1=&data[i*3];
-		vertex2=&data[i*3+1];
-		vertex3=&data[i*3+2];
+		vertex1=data[i*3];
+		vertex2=data[i*3+1];
+		vertex3=data[i*3+2];
+
+
+		//vertex shader/vertex transformation
+		vertex_shader(&vertex1);
+		vertex_shader(&vertex2);
+		vertex_shader(&vertex3);
 
 		//rasterization
-		raster_triangle(*vertex1, *vertex2, *vertex3, flags);
+		raster_triangle(&vertex1, &vertex2, &vertex3, flags);
 	}
 
 
@@ -160,7 +189,7 @@ void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, uint32_t 
 
 
 	//vertex transformation aka vertex shader
-	//glm::vec4 vex={vertex1.x, vertex1.y, vertex1.z, 0};
+	glm::vec4 vex={1,1,1,0};
 
 	return;	
 }

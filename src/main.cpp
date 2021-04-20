@@ -15,54 +15,56 @@ int main()
 	try
 	{
 		//initializing renderer
-		ssr::renderer renderer;
+		ssr::renderer renderer(0.5*PI, 1, 0.01, 1000);
 
 		ssr::vertex vertices[9];
 		//test triangle
-		ssr::vertex vertex1={0.0,	0.2,	0.01,	20,100,0}; //dark green
-		ssr::vertex vertex2={0.8,	0.2,	0.4,	20,100,0};
-		ssr::vertex vertex3={0.4,	0.8,	0.99,	20,100,0};
+		ssr::vertex vertex1={0.0,	-0.2,	0.11,	20,100,0}; //dark green
+		ssr::vertex vertex2={0.8,	-0.2,	0.11,	20,100,0};
+		ssr::vertex vertex3={0.4,	0.8,	0.11,	20,100,0};
 
 		vertices[0]=vertex1;
 		vertices[1]=vertex2;
 		vertices[2]=vertex3;
 
 		//second test triangle
-		ssr::vertex vertex4={0.0,	0.0,	0.6,	200,200,2};// yellow
-		ssr::vertex vertex5={0.7,	1,		0.6,	200,200,2};
-		ssr::vertex vertex6={1.1,	0.1,	0.6,	200,200,2};
+		ssr::vertex vertex4={-0.5,	0.0,	0.12,	200,200,2};// yellow
+		ssr::vertex vertex5={-0.7,	-1,		0.13,	200,200,2};
+		ssr::vertex vertex6={1.1,	0.1,	100,	200,200,2};
 
 		vertices[3]=vertex4;
 		vertices[4]=vertex5;
 		vertices[5]=vertex6;
 
-		ssr::vertex vertex7={0.5,	0.4,	0.2,	100,100,2};// yellow
-		ssr::vertex vertex8={0.51,	0.4,	0.2,	100,100,2};
-		ssr::vertex vertex9={0.53,	0.42,	0.2,	100,100,2};
+		ssr::vertex vertex7={0.5,	0.4,	0.1,	100,100,2};// yellow
+		ssr::vertex vertex8={0.51,	0.4,	0.1,	100,100,2};
+		ssr::vertex vertex9={0.53,	0.42,	0.1,	100,100,2};
 
 		vertices[6]=vertex7;
 		vertices[7]=vertex8;
 		vertices[8]=vertex9;
 
-		for(float i=1.6*PI; i<100; i=i+1)
+		for(float i=0.1; i<100; i=i+0.01)
 		{
-					//vertex2={0.3*cos(i)+0.5, 0.3*(float)sin(i)+0.5, 1, 255, 255, 255};
-							std::cout << "rendering:" << std::endl;
+			std::cout << "z: " << i << std::endl;
+							ssr::vertex vertex1={0,	0,	i,	20,100,0}; //dark green
+							ssr::vertex vertex2={1,	0,	i,	20,100,0};
+							ssr::vertex vertex3={0,	1,	i,	20,100,0};
+
+							vertices[0]=vertex1;
+							vertices[1]=vertex2;
+							vertices[2]=vertex3;
+
 							std::clock_t clock_begin = std::clock();	
 							for(uint32_t i = reps; i > 0; i--)
 							{
-								renderer.render(vertices, 2, SSR_FILL);
-								/*	renderer.render(vertex1, vertex2, vertex3, SSR_FILL);
-								renderer.render(vertex4, vertex5, vertex6, SSR_FILL);*/
+								renderer.render(vertices, 3, SSR_FILL);
+								renderer.update();
 							}
 							std::clock_t clock_end = std::clock();
 							std::cout << "execution time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
 							std::cout << "repetitions: " << reps << std::endl;
-
-							renderer.update();
-							SDL_Delay(3000);
 							exit(0);
-
 		}
 
 	}

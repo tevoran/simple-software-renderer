@@ -113,38 +113,52 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 //drawing a line from vertex1 to vertex2 while drawing a line from vertex1 to vertex3
 //in a second instance there is drawn a line from each pixel to corresponding pixel in
 //the second line
-void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3, uint32_t flags)
+void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, uint32_t flags)
 {
 	//end renderering, if vertices are beyond far plane
-	if(vertex1.z>1 && vertex2.z>1 && vertex3.z>1)
+	if(vertex1->z>1 && vertex2->z>1 && vertex3->z>1)
 	{
 		return;
 	}
 
 	//sorting vertices from lowest y-value to highest
-	if(vertex1.y>vertex2.y)
+	if(vertex1->y>vertex2->y)
 	{
 		std::swap(vertex1, vertex2);
 	}
-	if(vertex2.y>vertex3.y)
+	if(vertex2->y>vertex3->y)
 	{
 		std::swap(vertex2, vertex3);
 	}
-	if(vertex1.y>vertex2.y)
+	if(vertex1->y>vertex2->y)
 	{
 		std::swap(vertex1, vertex2);
 	}
 
 
 	//initializing necessary render variables
-	glm::ivec3 vex1=glm::ivec3((float)vertex1.x*backbuffer->w, (float)vertex1.y*backbuffer->h, (float)vertex1.z*INT32_MAX);
-	glm::ivec3 vex2=glm::ivec3((float)vertex2.x*backbuffer->w, (float)vertex2.y*backbuffer->h, (float)vertex2.z*INT32_MAX);
-	glm::ivec3 vex3=glm::ivec3((float)vertex3.x*backbuffer->w, (float)vertex3.y*backbuffer->h, (float)vertex3.z*INT32_MAX);
+	glm::ivec3 vex1=glm::ivec3((float)vertex1->x*backbuffer->w, (float)vertex1->y*backbuffer->h, (float)vertex1->z*INT32_MAX);
+	glm::ivec3 vex2=glm::ivec3((float)vertex2->x*backbuffer->w, (float)vertex2->y*backbuffer->h, (float)vertex2->z*INT32_MAX);
+	glm::ivec3 vex3=glm::ivec3((float)vertex3->x*backbuffer->w, (float)vertex3->y*backbuffer->h, (float)vertex3->z*INT32_MAX);
 
 	//end rendering if vertices are behind near plane
 	if(vex1.z<0 && vex2.z<0 && vex3.z<0)
 	{
 		return;
+	}
+
+	//small triangle (pixel sized)
+	if(vex2.x-vex1.x==0)
+	{
+		vex2.x++;
+	}
+	if(vex3.x-vex1.x==0)
+	{
+		vex3.x++;
+	}
+	if(vex3.y-vex1.y==0)
+	{
+		vex3.y++;
 	}
 
 	//Z-Buffering stuff
@@ -165,9 +179,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 	if(flags==SSR_WIREFRAME)
 	{
 		//drawing in wireframe mode
-		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y), vertex1.r, vertex1.g, vertex1.b);
-		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y), vertex2.r, vertex2.g, vertex2.b);
-		raster_line(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y), vertex3.r, vertex3.g, vertex3.b);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y), vertex1->r, vertex1->g, vertex1->b);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y), vertex2->r, vertex2->g, vertex2->b);
+		raster_line(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y), vertex3->r, vertex3->g, vertex3->b);
 		return;
 	}
 
@@ -180,9 +194,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
 
 		struct ssr::pixel pixel;
-		pixel.r=vertex1.r;
-		pixel.g=vertex1.g;
-		pixel.b=vertex1.b;
+		pixel.r=vertex1->r;
+		pixel.g=vertex1->g;
+		pixel.b=vertex1->b;
 		pixel.y=vex1.y;
 
 		uint64_t z_current_line=vex1.z;
@@ -216,6 +230,11 @@ void ssr::renderer::raster_triangle(struct ssr::vertex vertex1, struct ssr::vert
 					pixel.x=0;
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
+
+				/*uint32_t *pixel_ptr;
+				pixel_ptr=(uint32_t*)(backbuffer->pixels)+(pixel.y*res_x+pixel.x)*sizeof(uint32_t);
+				uint64_t *z_buffer_ptr;
+				z_buffer_ptr=z_buffer+(pixel.y*res_x+pixel.x)*sizeof(uint64_t);*/
 				do
 				{
 					draw_pixel(&pixel);
