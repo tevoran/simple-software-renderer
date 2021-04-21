@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project("simple-software-renderer")
 
-SET(CMAKE_CXX_FLAGS  "-g -pg")
+SET(CMAKE_CXX_FLAGS  "-g")
 
 find_library(SDL2 SDL2)
 find_package(SDL2 REQUIRED)
