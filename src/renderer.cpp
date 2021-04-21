@@ -129,7 +129,7 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 	{
 		//write in PIXELFORMAT_RGB888
 		static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
-		uint32_t pixel_colored=data->r;
+		register uint32_t pixel_colored=data->r;
 		pixel_colored=pixel_colored<<8;
 		pixel_colored+=data->g;
 		pixel_colored=pixel_colored<<8;
