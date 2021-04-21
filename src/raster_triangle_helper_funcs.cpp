@@ -91,7 +91,7 @@ ssr::renderer::triangle_line_rendering::triangle_line_rendering(glm::ivec2 in_st
 	error=ds/2;
 }
 
-void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
+int32_t ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 {
 	do
 	{
@@ -105,22 +105,18 @@ void ssr::renderer::triangle_line_rendering::triangle_line_iterate()
 
 			if(fast_x==true)
 			{
-				return;
+				break;
 			}
 		}
 
 		if(fast_x==false)
 		{
-			return;
+			break;
 		}
 	}
 	while(s!=s_end);
-}
 
-uint32_t ssr::renderer::triangle_line_rendering::get_x()
-{
-	uint32_t out=fast_x*s+(!fast_x*t);
-	return out;
+	return fast_x*s+(!fast_x*t);
 }
 
 void ssr::renderer::triangle_line_rendering::show_variables()

@@ -147,7 +147,26 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		return;
 	}
 
-	//small triangle (pixel sized)
+	//smalL triangles (pixel sized)
+	if(
+		vex3.x-vex1.x==0
+		&& vex2.x-vex1.x==0
+		&& vex3.y-vex1.y==0
+		&& vex2.y-vex1.y==0)
+	{
+		struct ssr::pixel pixel;
+		pixel.x=vex1.x;
+		pixel.y=vex1.y;
+		pixel.z=vex1.z;
+
+		//shading will be inserted here
+		pixel.r=vertex1->r;
+		pixel.g=vertex1->g;
+		pixel.b=vertex1->b;
+		draw_pixel(&pixel);
+		return;
+	}
+	//avoiding divisions by zero
 	if(vex2.x-vex1.x==0)
 	{
 		vex2.x++;
@@ -204,20 +223,28 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		//upper part of the triangle
 		do
 		{
-			line1.triangle_line_iterate();
-			pixel.x=line1.get_x();
+			pixel.x=line1.triangle_line_iterate();
 			pixel.y++;
 			z_current_line+=dz_dy;
 
-			line2.triangle_line_iterate();
+			int32_t x_end=line2.triangle_line_iterate();
 
 			//draw line
 			if(pixel.y>=0)
 			{
-				int32_t x_end=line2.get_x();
 				if(pixel.x>x_end)
 				{
 					std::swap(pixel.x, x_end);
+				}
+
+				if(pixel.x>=res_x)
+				{
+					continue;
+				}
+
+				if(x_end<0)
+				{
+					continue;
 				}
 
 				if(x_end>=res_x)
@@ -231,38 +258,48 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
-				/*uint32_t *pixel_ptr;
-				pixel_ptr=(uint32_t*)(backbuffer->pixels)+(pixel.y*res_x+pixel.x)*sizeof(uint32_t);
-				uint64_t *z_buffer_ptr;
-				z_buffer_ptr=z_buffer+(pixel.y*res_x+pixel.x)*sizeof(uint64_t);*/
-				do
+				uint32_t pixel_offset;
+				pixel_offset=pixel.x+pixel.y*backbuffer->w;
+				while(pixel.x<=x_end)
 				{
-					draw_pixel(&pixel);
+					if(pixel.z<z_buffer[pixel_offset])
+					{
+					draw_pixel_fast(&pixel, pixel_offset);						
+					}
+					pixel_offset++;
+
 					pixel.z+=dz_dx;
 					pixel.x++;
 				}
-				while(pixel.x<=x_end);
 			}
 		}
 		while(pixel.y<vex2.y);
 		
 		//lower part of the triangle
-		do
+		while(pixel.y<=vex3.y && pixel.y<(res_y-1))
 		{
-			line1.triangle_line_iterate();
-			pixel.x=line1.get_x();
+			pixel.x=line1.triangle_line_iterate();
 			pixel.y++;
 			z_current_line+=dz_dy;
 
-			line3.triangle_line_iterate();
+			int32_t x_end=line3.triangle_line_iterate();
 
 			//draw line
 			if(pixel.y>=0)
 			{
-				int32_t x_end=line3.get_x();
 				if(pixel.x>x_end)
 				{
 					std::swap(pixel.x, x_end);
+				}
+
+				if(pixel.x>=res_x)
+				{
+					continue;
+				}
+
+				if(x_end<0)
+				{
+					continue;
 				}
 
 				if(x_end>=res_x)
@@ -275,15 +312,21 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 					pixel.x=0;
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
-				do
+
+				uint32_t pixel_offset;
+				pixel_offset=pixel.x+pixel.y*backbuffer->w;
+				while(pixel.x<=x_end)
 				{
-					draw_pixel(&pixel);
+					if(pixel.z<z_buffer[pixel_offset])
+					{
+					draw_pixel_fast(&pixel, pixel_offset);						
+					}
+					pixel_offset++;
+
 					pixel.z+=dz_dx;
 					pixel.x++;
 				}
-				while(pixel.x<=x_end);
 			}
 		}
-		while(pixel.y<=vex3.y && pixel.y<res_y);
 	}
 }

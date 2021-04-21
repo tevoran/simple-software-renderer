@@ -15,7 +15,7 @@ int main()
 	try
 	{
 		//initializing renderer
-		ssr::renderer renderer(0.5*PI, 1, 0.01, 1000);
+		ssr::renderer renderer(0.5*PI, (float)16/(float)16, 0.01, 1000);
 
 		ssr::vertex vertices[9];
 		//test triangle
@@ -36,9 +36,9 @@ int main()
 		vertices[4]=vertex5;
 		vertices[5]=vertex6;
 
-		ssr::vertex vertex7={0.5,	0.4,	0.1,	100,100,2};// yellow
-		ssr::vertex vertex8={0.51,	0.4,	0.1,	100,100,2};
-		ssr::vertex vertex9={0.53,	0.42,	0.1,	100,100,2};
+		ssr::vertex vertex7={4,	0,	10,	100,100,2};// yellow
+		ssr::vertex vertex8={5,	0,	10,	100,100,2};
+		ssr::vertex vertex9={2,	1,	10,	100,100,2};
 
 		vertices[6]=vertex7;
 		vertices[7]=vertex8;

@@ -91,9 +91,8 @@ namespace ssr
 
 					public:
 						triangle_line_rendering(glm::ivec2 in_start, glm::ivec2 in_end);
-						void triangle_line_iterate();
+						int32_t triangle_line_iterate(); //returns current x-value of the line
 						void show_variables();
-						uint32_t get_x();
 				};
 
 
@@ -102,7 +101,7 @@ namespace ssr
 			~renderer();
 			void update();
 			void draw_pixel(struct ssr::pixel *data); //make sure that your pixel is on screen otherwise there is undefined behaviour
-			void draw_next_pixel(uint32_t *pixel_ptr, uint64_t *z_buffer_ptr, struct ssr::pixel *data);
+			void draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offset); //draws at the pixel offset and the z-buffer check needs already to be done
 			void render(struct vertex *data, uint32_t num_polygons/*struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3*/, uint32_t flags);
 
 	};

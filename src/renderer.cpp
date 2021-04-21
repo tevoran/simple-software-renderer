@@ -58,7 +58,6 @@ ssr::renderer::renderer(float fov_y, float aspect_ratio, float near_z_clip, floa
 
 
 		//Projection matrix
-		//perspective_mat=glm::perspective(fov_y, (float)1, near_z_clip, far_z_clip);
 		perspective_mat[0].x=tan(0.5*PI-0.5*fov_y);
 		perspective_mat[0].y=0;
 		perspective_mat[0].z=0;
@@ -128,7 +127,7 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 	if(data->z<z_buffer[pixel_offset])
 	{
 		//write in PIXELFORMAT_RGB888
-		static uint32_t *pixel_ptr = static_cast<uint32_t*>(backbuffer->pixels);
+		uint32_t *pixel_ptr = (uint32_t*)(backbuffer->pixels);
 		register uint32_t pixel_colored=data->r;
 		pixel_colored=pixel_colored<<8;
 		pixel_colored+=data->g;
@@ -140,23 +139,18 @@ void ssr::renderer::draw_pixel(struct ssr::pixel *data)
 	}
 }
 
-void ssr::renderer::draw_next_pixel(uint32_t *pixel_ptr, uint64_t *z_buffer_ptr, struct ssr::pixel *data)
+void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offset)
 {
-	*pixel_ptr++;
-	*z_buffer_ptr++;
+	//write in PIXELFORMAT_RGB888
+	uint32_t *pixel_ptr = (uint32_t*)(backbuffer->pixels);
+	register uint32_t pixel_colored=data->r;
+	pixel_colored=pixel_colored<<8;
+	pixel_colored+=data->g;
+	pixel_colored=pixel_colored<<8;
+	pixel_colored+=data->b;
+	pixel_ptr[pixel_offset]=pixel_colored;
 
-	if(data->z<(*z_buffer_ptr))
-	{
-		//write in PIXELFORMAT_RGB888
-		uint32_t pixel_colored=data->r;
-		pixel_colored=pixel_colored<<8;
-		pixel_colored+=data->g;
-		pixel_colored=pixel_colored<<8;
-		pixel_colored+=data->b;
-		*pixel_ptr=pixel_colored;
-
-		*z_buffer_ptr=data->z;
-	}
+	z_buffer[pixel_offset]=data->z;
 }
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
