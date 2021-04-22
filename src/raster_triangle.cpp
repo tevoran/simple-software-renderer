@@ -113,7 +113,7 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 //drawing a line from vertex1 to vertex2 while drawing a line from vertex1 to vertex3
 //in a second instance there is drawn a line from each pixel to corresponding pixel in
 //the second line
-void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, uint32_t flags)
+void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, ssr::texture texture, uint32_t flags)
 {
 	//end renderering, if vertices are beyond far plane
 	if(vertex1->z>1 && vertex2->z>1 && vertex3->z>1)
@@ -218,6 +218,60 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		pixel.b=vertex1->b;
 		pixel.y=vex1.y;
 
+		//determining u-v-texture coordinates
+		float u0=vertex1->u;
+		float v0=vertex1->v;
+
+		//calculating steps during y-axis movement
+		float du_dvex3=(vertex3->u-vertex1->u)/
+						sqrt((vex3.x-vex1.x)*(vex3.x-vex1.x)+(vex3.y-vex1.y)*(vex3.y-vex1.y));
+		float dv_dvex3=(vertex3->v-vertex1->v)/
+						sqrt((vex3.x-vex1.x)*(vex3.x-vex1.x)+(vex3.y-vex1.y)*(vex3.y-vex1.y));
+
+
+		//calculating steps during x-axis movement
+		float factor=((float)(vex2.y-vex1.y)/(float)(vex3.y-vex1.y));
+		int32_t base_x=vex1.x+factor*(vex3.x-vex1.x);
+
+		float base_u=factor*(float)res_y*du_dvex3;
+		//float base_v=factor*(float)res_y*dv_dvex3;
+
+		float du_dvex2=(vertex2->u-base_u)/(vex2.x-base_x);
+		//float dv_dvex2=(vertex2->v-base_v)/(vex2.x-base_x);
+
+		/*float h;
+
+		glm::ivec3 height_base;
+		float height_base_u;
+		float height_base_v;
+
+		{
+			//vertex1-2
+			float a=sqrt((vex2.x-vex1.x)*(vex2.x-vex1.x)+(vex2.y-vex1.y)*(vex2.y-vex1.y));
+			//vertex2-3
+			float b=sqrt((vex3.x-vex2.x)*(vex3.x-vex2.x)+(vex3.y-vex2.y)*(vex2.y-vex2.y));
+			//vertex1-3
+			float c=sqrt((vex3.x-vex1.x)*(vex3.x-vex1.x)+(vex3.y-vex1.y)*(vex3.y-vex1.y));
+
+			float s=(a+b+c)/2;
+
+			float area=sqrt(s*(s-a)*(s-b)*(s-c));
+			h=2*area/c;
+
+			float factor=sqrt(b*b-h*h)/c;
+
+			height_base=glm::ivec3(factor*(vex3.x-vex1.x)+vex1.x, factor*(vex3.y-vex1.y)+vex1.y, 0);
+
+			height_base_u=factor*(vertex3->u-vertex1->u);
+			height_base_v=factor*(vertex3->v-vertex1->v);
+		}*/
+
+		pixel.u=vertex1->u;
+		pixel.v=vertex1->v;
+
+		float u_current_line=vertex1->u;
+		float v_current_line=vertex1->v;
+
 		uint64_t z_current_line=vex1.z;
 
 		//upper part of the triangle
@@ -226,6 +280,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 			pixel.x=line1.triangle_line_iterate();
 			pixel.y++;
 			z_current_line+=dz_dy;
+
+			//u_current_line+=du_dvex3;
+			v_current_line+=dv_dvex3;
 
 			int32_t x_end=line2.triangle_line_iterate();
 
@@ -258,17 +315,23 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
+				pixel.u=u_current_line;
+				pixel.v=v_current_line;
+
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
 				while(pixel.x<=x_end)
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
-					draw_pixel_fast(&pixel, pixel_offset);						
+						texture_map(&pixel, texture, 0, 0);
+						draw_pixel_fast(&pixel, pixel_offset);						
 					}
 					pixel_offset++;
 
 					pixel.z+=dz_dx;
+					pixel.u+=du_dvex2;
+					//pixel.v+=dv_dvex2;
 					pixel.x++;
 				}
 			}
@@ -281,6 +344,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 			pixel.x=line1.triangle_line_iterate();
 			pixel.y++;
 			z_current_line+=dz_dy;
+
+			//u_current_line+=du_dvex3;
+			v_current_line+=dv_dvex3;
 
 			int32_t x_end=line3.triangle_line_iterate();
 
@@ -313,17 +379,23 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
+				pixel.u=u_current_line;
+				pixel.v=v_current_line;
+
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
 				while(pixel.x<=x_end)
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
-					draw_pixel_fast(&pixel, pixel_offset);						
+						texture_map(&pixel, texture, 0, 0);
+						draw_pixel_fast(&pixel, pixel_offset);						
 					}
 					pixel_offset++;
 
 					pixel.z+=dz_dx;
+					pixel.u+=du_dvex2;
+					//pixel.v+=dv_dvex2;
 					pixel.x++;
 				}
 			}

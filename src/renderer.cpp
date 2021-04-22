@@ -13,8 +13,12 @@
 #include <limits.h>
 
 
-ssr::renderer::renderer(float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip)
+ssr::renderer::renderer(int res_x_in, int res_y_in, float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip)
 {
+	res_x=res_x_in;
+	res_y=res_y_in;
+	std::cout << "Resolution: " << res_x << "x" << res_y << std::endl;
+
 	//SDL INIT
 	if(SDL_Init(SDL_INIT_EVERYTHING)==0)
 		{
@@ -53,7 +57,6 @@ ssr::renderer::renderer(float fov_y, float aspect_ratio, float near_z_clip, floa
 		//Z-Buffer initialization
 		z_buffer=new uint64_t[backbuffer->w * backbuffer->h];
 
-		std::cout << "Resolution: " << backbuffer->w << "x" << backbuffer->h << std::endl;
 		memset(z_buffer, 0xFF, backbuffer->h*backbuffer->w*sizeof(uint64_t));
 
 
@@ -79,7 +82,6 @@ ssr::renderer::renderer(float fov_y, float aspect_ratio, float near_z_clip, floa
 		perspective_mat[3].w=1;
 
 		std::cout << glm::to_string(perspective_mat) << std::endl;
-		SDL_Delay(1000);
 }
 
 ssr::renderer::~renderer()
@@ -155,7 +157,7 @@ void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offs
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
-void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, uint32_t flags)
+void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, ssr::texture texture, uint32_t flags)
 {	
 	static struct vertex vertex1, vertex2, vertex3;
 
@@ -173,7 +175,7 @@ void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, uint32_t 
 		vertex_shader(&vertex3);
 
 		//rasterization
-		raster_triangle(&vertex1, &vertex2, &vertex3, flags);
+		raster_triangle(&vertex1, &vertex2, &vertex3, texture, flags);
 	}
 
 

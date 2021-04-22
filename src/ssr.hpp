@@ -30,6 +30,9 @@ namespace ssr
 		uint8_t r;
 		uint8_t g;
 		uint8_t b;
+
+		float u; //has to be between 0 and 1
+		float v; //has to be between 0 and 1
 	};
 
 	struct pixel
@@ -42,14 +45,27 @@ namespace ssr
 		uint8_t b;
 
 		uint64_t z;
+
+		float u; //has to be between 0 and 1
+		float v; //has to be between 0 and 1
 	};
+
+	struct texture
+	{
+		//dimensions of the texture
+		uint32_t x;
+		uint32_t y;
+
+		uint32_t *pixel_data;
+	};
+
 
 	//renderer
 	class renderer
 	{
 		private:
-			int res_x=1920;
-			int res_y=1080;
+			int res_x;
+			int res_y;
 			SDL_Window *window = NULL; //set in constructor
 			SDL_Surface *backbuffer = NULL; //set in constructor
 			uint32_t pixel_type; //set in constructor
@@ -65,7 +81,7 @@ namespace ssr
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
-			void raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, uint32_t flags);
+			void raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, ssr::texture texture, uint32_t flags);
 
 			void vertex_shader(ssr::vertex *vertex);
 
@@ -97,12 +113,13 @@ namespace ssr
 
 
 		public:
-			renderer(float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip);
+			renderer(int res_x_in, int res_y_in, float fov_y, float aspect_ratio, float near_z_clip, float far_z_clip);
 			~renderer();
 			void update();
 			void draw_pixel(struct ssr::pixel *data); //make sure that your pixel is on screen otherwise there is undefined behaviour
 			void draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offset); //draws at the pixel offset and the z-buffer check needs already to be done
-			void render(struct vertex *data, uint32_t num_polygons/*struct ssr::vertex vertex1, struct ssr::vertex vertex2, struct ssr::vertex vertex3*/, uint32_t flags);
+			void texture_map(struct ssr::pixel *data, struct ssr::texture texture, float u, float v);
+			void render(struct vertex *data, uint32_t num_polygons, ssr::texture texture, uint32_t flags);
 
 	};
 }
