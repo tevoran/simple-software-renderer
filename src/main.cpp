@@ -62,12 +62,12 @@ int main()
 		texture.pixel_data[15]=0x00500050;
 
 
-		for(float i=0.1; i<100; i=i+0.01)
+		for(float i=0.1; i<10; i=i+0.01)
 		{
 			
 							ssr::vertex vertex1={-1,	-1,	10*sin(i)+15,	20,100,0,	0, 0}; //dark green
-							ssr::vertex vertex2={1,		-1,	10*sin(i)+15,	20,100,0,	1, 0};
-							ssr::vertex vertex3={-1,	1,	10*sin(i)+15,	20,100,0,	1, 1};
+							ssr::vertex vertex2={1,		-1,	10*sin(i)+15,	20,100,0,	0, 1};
+							ssr::vertex vertex3={-1,	1,	10*sin(i)+15,	20,100,0,	1, 0};
 
 							vertices[0]=vertex1;
 							vertices[1]=vertex2;
