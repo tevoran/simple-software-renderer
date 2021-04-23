@@ -113,10 +113,17 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 //drawing a line from vertex1 to vertex2 while drawing a line from vertex1 to vertex3
 //in a second instance there is drawn a line from each pixel to corresponding pixel in
 //the second line
-void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, ssr::texture texture, uint32_t flags)
+void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, const ssr::texture *texture, uint32_t flags)
 {
+	/*checking if triangle actually needs to be rasterized*/
 	//end renderering, if vertices are beyond far plane
 	if(vertex1->z>1 && vertex2->z>1 && vertex3->z>1)
+	{
+		return;
+	}
+
+	//end rendering if vertices are behind near plane
+	if(vertex1->z<0 && vertex2->z<0 && vertex3->z<0)
 	{
 		return;
 	}
@@ -141,59 +148,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 	glm::ivec3 vex2=glm::ivec3((float)vertex2->x*backbuffer->w, (float)vertex2->y*backbuffer->h, (float)vertex2->z*INT32_MAX);
 	glm::ivec3 vex3=glm::ivec3((float)vertex3->x*backbuffer->w, (float)vertex3->y*backbuffer->h, (float)vertex3->z*INT32_MAX);
 
-	//end rendering if vertices are behind near plane
-	if(vex1.z<0 && vex2.z<0 && vex3.z<0)
-	{
-		return;
-	}
-
-	//smalL triangles (pixel sized)
-	if(
-		vex3.x-vex1.x==0
-		&& vex2.x-vex1.x==0
-		&& vex3.y-vex1.y==0
-		&& vex2.y-vex1.y==0)
-	{
-		struct ssr::pixel pixel;
-		pixel.x=vex1.x;
-		pixel.y=vex1.y;
-		pixel.z=vex1.z;
-
-		//shading will be inserted here
-		pixel.r=vertex1->r;
-		pixel.g=vertex1->g;
-		pixel.b=vertex1->b;
-		draw_pixel(&pixel);
-		return;
-	}
-
-	//avoiding divisions by zero
-	if(vex2.x-vex1.x==0)
-	{
-		vex2.x++;
-	}
-	if(vex3.x-vex1.x==0)
-	{
-		vex3.x++;
-	}
-	if(vex3.y-vex1.y==0)
-	{
-		vex3.y++;
-	}
-
-	//Z-Buffering stuff
-	int64_t dz_dy=(vex3.z-vex1.z)/(vex3.y-vex1.y);
-	int64_t dz_dx;
-
-	if((vex3.x-vex1.x)*(vex3.x-vex1.x)>(vex2.x-vex1.x)*(vex2.x-vex1.x))
-	{
-		dz_dx=(vex3.z-vex1.z)/(vex3.x-vex1.x);
-	}
-	else
-	{
-		dz_dx=(vex2.z-vex1.z)/(vex2.x-vex1.x);
-	}
-
 
 	//draw in wireframe mode
 	if(flags==SSR_WIREFRAME)
@@ -209,6 +163,34 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 	//drawing in fill mode
 	if(flags==SSR_FILL)
 	{
+
+		//avoiding divisions by zero
+		if(vex2.x-vex1.x==0)
+		{
+			vex2.x++;
+		}
+		if(vex3.x-vex1.x==0)
+		{
+			vex3.x++;
+		}
+		if(vex3.y-vex1.y==0)
+		{
+			vex3.y++;
+		}
+
+		//Z-Buffering stuff
+		int64_t dz_dy=(vex3.z-vex1.z)/(vex3.y-vex1.y);
+		int64_t dz_dx;
+
+		if((vex3.x-vex1.x)*(vex3.x-vex1.x)>(vex2.x-vex1.x)*(vex2.x-vex1.x))
+		{
+			dz_dx=(vex3.z-vex1.z)/(vex3.x-vex1.x);
+		}
+		else
+		{
+			dz_dx=(vex2.z-vex1.z)/(vex2.x-vex1.x);
+		}
+
 		ssr::renderer::triangle_line_rendering line1(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y)); //line 1 (vex1-3)
 		ssr::renderer::triangle_line_rendering line2(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y)); //line 2 (vex1-2)
 		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
@@ -219,14 +201,14 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		pixel.b=vertex1->b;
 		pixel.y=vex1.y;
 
-		//determining u-v-texture coordinates
-		float cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)+(vex3.x-vex2.x));
+		//texture calculation
+		int64_t cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)+(vex3.x-vex2.x));
 
 
 		uint64_t z_current_line=vex1.z;
 
 		//upper part of the triangle
-		do
+		while(pixel.y<vex2.y)
 		{
 			pixel.x=line1.triangle_line_iterate();
 			pixel.y++;
@@ -263,31 +245,47 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
+				//texture calculation
+				//if drawing a line optimizations
+				int64_t vex1_dy=vex1.y-pixel.y;
+				int64_t vex2_dy=vex2.y-pixel.y;
+				int64_t vex3_dy=vex3.y-pixel.y;
 
+				int64_t m1_dx=vex2_dy-vex3_dy;
+				int64_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
+				int64_t m1_line=m1_const+m1_dx*pixel.x;
+
+				int64_t m2_dx=vex3_dy-vex1_dy;
+				int64_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
+				int64_t m2_line=m2_const+m2_dx*pixel.x;
+
+
+				//the actual number of the pixel that is drawn
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
 				while(pixel.x<=x_end && pixel_offset<(res_x*res_y))
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
+						//texture calculation
 						//calculating u-v-coordinates
 						{
-							float m1=(vex2.x-pixel.x)*(vex3.y-pixel.y)-(vex3.x-pixel.x)*(vex2.y-pixel.y);
-							m1=m1/cramer_div;
-
-							float m2=(vex3.x-pixel.x)*(vex1.y-pixel.y)-(vex1.x-pixel.x)*(vex3.y-pixel.y);
-							m2=m2/cramer_div;
-
-
-							float m3=1-m1-m2;
+							m1_line+=m1_dx;
+							m2_line+=m2_dx;
+							float m1=m1_line;
+							float m2=m2_line;
+							float m3=cramer_div-m1-m2;
+							m1/=cramer_div;
+							m2/=cramer_div;
+							m3/=cramer_div;
 
 							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
 							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
 
 							pixel.u=pixel.u-(int)pixel.u;
 							pixel.v=pixel.v-(int)pixel.v;
-							texture_map(&pixel, texture, 0, 0);
 						}
+						texture_map(&pixel, texture);
 						draw_pixel_fast(&pixel, pixel_offset);						
 					}
 					pixel_offset++;
@@ -297,7 +295,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 			}
 		}
-		while(pixel.y<vex2.y);
 		
 		//lower part of the triangle
 		while(pixel.y<=vex3.y && pixel.y<(res_y-1))
@@ -337,31 +334,49 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 					pixel.x=0;
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
+				
+				//texture calculation
+				//if drawing a line optimizations
+				int64_t vex1_dy=vex1.y-pixel.y;
+				int64_t vex2_dy=vex2.y-pixel.y;
+				int64_t vex3_dy=vex3.y-pixel.y;
 
+				int64_t m1_dx=vex2_dy-vex3_dy;
+				int64_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
+				int64_t m1_line=m1_const+m1_dx*pixel.x;
+
+				int64_t m2_dx=vex3_dy-vex1_dy;
+				int64_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
+				int64_t m2_line=m2_const+m2_dx*pixel.x;
+
+				//offset for the next x-value
+
+				//the actual number of the pixel that is drawn
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
 				while(pixel.x<=x_end && pixel_offset<(res_x*res_y))
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
+						//texture calculation
 						//calculating u-v-coordinates
 						{
-							float m1=(vex2.x-pixel.x)*(vex3.y-pixel.y)-(vex3.x-pixel.x)*(vex2.y-pixel.y);
-							m1=m1/cramer_div;
-
-							float m2=(vex3.x-pixel.x)*(vex1.y-pixel.y)-(vex1.x-pixel.x)*(vex3.y-pixel.y);
-							m2=m2/cramer_div;
-
-
-							float m3=1-m1-m2;
+							m1_line+=m1_dx;
+							m2_line+=m2_dx;
+							float m1=m1_line;
+							float m2=m2_line;
+							float m3=cramer_div-m1-m2;
+							m1/=cramer_div;
+							m2/=cramer_div;
+							m3/=cramer_div;
 
 							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
 							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
 
 							pixel.u=pixel.u-(int)pixel.u;
 							pixel.v=pixel.v-(int)pixel.v;
-							texture_map(&pixel, texture, 0, 0);
 						}
+						texture_map(&pixel, texture);
 						draw_pixel_fast(&pixel, pixel_offset);						
 					}
 					pixel_offset++;

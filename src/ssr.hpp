@@ -81,7 +81,7 @@ namespace ssr
 
 		private:
 			void raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uint8_t g, uint8_t b);
-			void raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, ssr::texture texture, uint32_t flags);
+			void raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, const ssr::texture *texture, uint32_t flags);
 
 			void vertex_shader(ssr::vertex *vertex);
 
@@ -118,8 +118,8 @@ namespace ssr
 			void update();
 			void draw_pixel(struct ssr::pixel *data); //make sure that your pixel is on screen otherwise there is undefined behaviour
 			void draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offset); //draws at the pixel offset and the z-buffer check needs already to be done
-			void texture_map(struct ssr::pixel *data, struct ssr::texture texture, float u, float v);
-			void render(struct vertex *data, uint32_t num_polygons, ssr::texture texture, uint32_t flags);
+			void texture_map(struct ssr::pixel *data, const struct ssr::texture *texture);
+			void render(struct vertex *data, uint32_t num_polygons, const ssr::texture *texture, uint32_t flags);
 
 	};
 }

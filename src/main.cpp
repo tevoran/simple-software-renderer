@@ -76,7 +76,7 @@ int main()
 							std::clock_t clock_begin = std::clock();	
 							for(uint32_t i = reps; i > 0; i--)
 							{
-								renderer.render(vertices, 3, texture, SSR_FILL);
+								renderer.render(vertices, 3, &texture, SSR_FILL);
 								renderer.update();
 							}
 							std::clock_t clock_end = std::clock();

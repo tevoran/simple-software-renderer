@@ -157,7 +157,7 @@ void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offs
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
-void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, ssr::texture texture, uint32_t flags)
+void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, const ssr::texture *texture, uint32_t flags)
 {	
 	static struct vertex vertex1, vertex2, vertex3;
 
