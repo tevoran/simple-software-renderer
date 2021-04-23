@@ -202,7 +202,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		pixel.y=vex1.y;
 
 		//texture calculation
-		int64_t cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)+(vex3.x-vex2.x));
+		int64_t cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)*(vex3.x-vex2.x));
 
 
 		uint64_t z_current_line=vex1.z;
@@ -245,19 +245,18 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
-				//texture calculation
-				//if drawing a line optimizations
-				int64_t vex1_dy=vex1.y-pixel.y;
-				int64_t vex2_dy=vex2.y-pixel.y;
-				int64_t vex3_dy=vex3.y-pixel.y;
+				//texture calculation optimizations
+				int32_t vex1_dy=vex1.y-pixel.y;
+				int32_t vex2_dy=vex2.y-pixel.y;
+				int32_t vex3_dy=vex3.y-pixel.y;
 
-				int64_t m1_dx=vex2_dy-vex3_dy;
+				int32_t m1_dx=vex2_dy-vex3_dy;
 				int64_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
-				int64_t m1_line=m1_const+m1_dx*pixel.x;
+				int32_t m1_line=m1_const+m1_dx*pixel.x;
 
-				int64_t m2_dx=vex3_dy-vex1_dy;
-				int64_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
-				int64_t m2_line=m2_const+m2_dx*pixel.x;
+				int32_t m2_dx=vex3_dy-vex1_dy;
+				int32_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
+				int32_t m2_line=m2_const+m2_dx*pixel.x;
 
 
 				//the actual number of the pixel that is drawn
@@ -272,18 +271,26 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 						{
 							m1_line+=m1_dx;
 							m2_line+=m2_dx;
-							float m1=m1_line;
-							float m2=m2_line;
-							float m3=cramer_div-m1-m2;
-							m1/=cramer_div;
-							m2/=cramer_div;
-							m3/=cramer_div;
 
-							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
-							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
+							//std::cout << "m1_line: " << m1_line << std::endl;
+							//std::cout << "cramer_div: " << cramer_div << std::endl;
+							float m1=(float)m1_line/(float)cramer_div;
+							float m2=(float)m2_line/(float)cramer_div;
+							float m3=1-m1-m2;
 
-							pixel.u=pixel.u-(int)pixel.u;
-							pixel.v=pixel.v-(int)pixel.v;
+							pixel.u=(float)m1*vertex1->u+(float)m2*vertex2->u+(float)m3*vertex3->u;
+							pixel.v=(float)m1*vertex1->v+(float)m2*vertex2->v+(float)m3*vertex3->v;
+
+							//std::cout << "vertex1: " << vertex1->u << "x" << vertex1->v << std::endl;
+							//std::cout << "vertex2: " << vertex2->u << "x" << vertex2->v << std::endl;
+							//std::cout << "vertex3: " << vertex3->u << "x" << vertex3->v << std::endl;
+
+							//std::cout << m1 << "x" << m2 << "x" << m3 << std::endl;
+							//std::cout << pixel.u << "x" << pixel.v << std::endl;
+							pixel.u=abs(pixel.u-(int)pixel.u);
+							pixel.v=abs(pixel.v-(int)pixel.v);
+							//std::cout << pixel.u << "x" << pixel.v << std::endl;
+							//SDL_Delay(1000);
 						}
 						texture_map(&pixel, texture);
 						draw_pixel_fast(&pixel, pixel_offset);						
@@ -335,21 +342,18 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				}
 				pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 				
-				//texture calculation
-				//if drawing a line optimizations
-				int64_t vex1_dy=vex1.y-pixel.y;
-				int64_t vex2_dy=vex2.y-pixel.y;
-				int64_t vex3_dy=vex3.y-pixel.y;
+				//texture calculation optimizations
+				int32_t vex1_dy=vex1.y-pixel.y;
+				int32_t vex2_dy=vex2.y-pixel.y;
+				int32_t vex3_dy=vex3.y-pixel.y;
 
-				int64_t m1_dx=vex2_dy-vex3_dy;
-				int64_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
-				int64_t m1_line=m1_const+m1_dx*pixel.x;
+				int32_t m1_dx=vex2_dy-vex3_dy;
+				int32_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
+				int32_t m1_line=m1_const+m1_dx*pixel.x;
 
-				int64_t m2_dx=vex3_dy-vex1_dy;
-				int64_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
-				int64_t m2_line=m2_const+m2_dx*pixel.x;
-
-				//offset for the next x-value
+				int32_t m2_dx=vex3_dy-vex1_dy;
+				int32_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
+				int32_t m2_line=m2_const+m2_dx*pixel.x;
 
 				//the actual number of the pixel that is drawn
 				uint32_t pixel_offset;
@@ -363,18 +367,19 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 						{
 							m1_line+=m1_dx;
 							m2_line+=m2_dx;
-							float m1=m1_line;
-							float m2=m2_line;
-							float m3=cramer_div-m1-m2;
-							m1/=cramer_div;
-							m2/=cramer_div;
-							m3/=cramer_div;
+							float m1=(float)m1_line/(float)cramer_div;
+							float m2=(float)m2_line/(float)cramer_div;
+							float m3=1-m1-m2;
 
-							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
-							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
+							pixel.u=(float)m1*vertex1->u+(float)m2*vertex2->u+(float)m3*vertex3->u;
+							pixel.v=(float)m1*vertex1->v+(float)m2*vertex2->v+(float)m3*vertex3->v;
 
-							pixel.u=pixel.u-(int)pixel.u;
-							pixel.v=pixel.v-(int)pixel.v;
+							//std::cout << m1 << "x" << m2 << "x" << m3 << std::endl;
+							//std::cout << pixel.u << "x" << pixel.v << std::endl;
+							pixel.u=abs(pixel.u-(int)pixel.u);
+							pixel.v=abs(pixel.v-(int)pixel.v);
+							//std::cout << pixel.u << "x" << pixel.v << std::endl;
+							//SDL_Delay(1000);
 						}
 						texture_map(&pixel, texture);
 						draw_pixel_fast(&pixel, pixel_offset);						

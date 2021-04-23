@@ -159,7 +159,8 @@ void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offs
 0 and 1 along the different axes.*/
 void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, const ssr::texture *texture, uint32_t flags)
 {	
-	static struct vertex vertex1, vertex2, vertex3;
+	//copies are necessary otherwise the raster function will exchange the vertices
+	struct vertex vertex1, vertex2, vertex3;
 
 	for(int i=0; i<num_polygons; i++)
 	{
