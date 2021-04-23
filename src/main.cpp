@@ -20,9 +20,9 @@ int main()
 		ssr::vertex vertices[9];
 		
 		//second test triangle
-		ssr::vertex vertex4={-0.5,	0.0,	0.12,	200,200,2,	0, 0};// yellow
-		ssr::vertex vertex5={-0.7,	-1,		0.13,	200,200,2,	1, 0};
-		ssr::vertex vertex6={1.1,	0.1,	100,	200,200,2,	1, 1};
+		ssr::vertex vertex4={1,	0,	9,	200,200,2,	1, 1};// yellow
+		ssr::vertex vertex5={1,	0,	7,	200,200,2,	0, 1};
+		ssr::vertex vertex6={0,	1,	3,	200,200,2,	1, 0};
 
 		vertices[3]=vertex4;
 		vertices[4]=vertex5;
@@ -62,12 +62,12 @@ int main()
 		texture.pixel_data[15]=0x00500050;
 
 
-		for(float i=0.1; i<10; i=i+0.01)
+		for(float i=0.1; i<100; i=i+0.01)
 		{
 			
-							ssr::vertex vertex1={-1,	-1,	10*sin(i)+15,	20,100,0,	0, 0}; //dark green
-							ssr::vertex vertex2={1,		-1,	10*sin(i)+15,	20,100,0,	0, 1};
-							ssr::vertex vertex3={-1,	1,	10*sin(i)+15,	20,100,0,	1, 0};
+							ssr::vertex vertex1={-1,	-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 0}; //dark green
+							ssr::vertex vertex2={1,		-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 1};
+							ssr::vertex vertex3={-1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 0};
 
 							vertices[0]=vertex1;
 							vertices[1]=vertex2;

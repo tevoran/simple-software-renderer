@@ -266,10 +266,11 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
-				while(pixel.x<=x_end)
+				while(pixel.x<=x_end && pixel_offset<(res_x*res_y))
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
+						//calculating u-v-coordinates
 						{
 							float m1=(vex2.x-pixel.x)*(vex3.y-pixel.y)-(vex3.x-pixel.x)*(vex2.y-pixel.y);
 							m1=m1/cramer_div;
@@ -283,10 +284,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
 							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
 
-							if(pixel.u>=0 && pixel.u<=1 && pixel.v>=0 && pixel.v<=1)
-							{
-								texture_map(&pixel, texture, 0, 0);
-							}
+							pixel.u=pixel.u-(int)pixel.u;
+							pixel.v=pixel.v-(int)pixel.v;
+							texture_map(&pixel, texture, 0, 0);
 						}
 						draw_pixel_fast(&pixel, pixel_offset);						
 					}
@@ -340,10 +340,11 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
-				while(pixel.x<=x_end)
+				while(pixel.x<=x_end && pixel_offset<(res_x*res_y))
 				{
 					if(pixel.z<z_buffer[pixel_offset])
 					{
+						//calculating u-v-coordinates
 						{
 							float m1=(vex2.x-pixel.x)*(vex3.y-pixel.y)-(vex3.x-pixel.x)*(vex2.y-pixel.y);
 							m1=m1/cramer_div;
@@ -357,10 +358,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 							pixel.u=m1*vertex1->u+m2*vertex2->u+m3*vertex3->u;
 							pixel.v=m1*vertex1->v+m2*vertex2->v+m3*vertex3->v;
 
-							if(pixel.u>=0 && pixel.u<=1 && pixel.v>=0 && pixel.v<=1)
-							{
-								texture_map(&pixel, texture, 0, 0);
-							}
+							pixel.u=pixel.u-(int)pixel.u;
+							pixel.v=pixel.v-(int)pixel.v;
+							texture_map(&pixel, texture, 0, 0);
 						}
 						draw_pixel_fast(&pixel, pixel_offset);						
 					}
