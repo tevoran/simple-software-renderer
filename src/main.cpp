@@ -1,6 +1,8 @@
 #include <glm/glm.hpp>
 #define LOADBMP_IMPLEMENTATION
 #include <loadbmp.h>
+#define FAST_OBJ_IMPLEMENTATION
+#include <fast_obj.h>
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <math.h>
@@ -18,6 +20,9 @@ int main()
 	{
 		//initializing renderer
 		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 1000);
+
+		//loading test model
+		fastObjMesh *teapot = fast_obj_read("../assets/teapot.obj");
 
 		ssr::vertex vertices[12];
 		
@@ -39,9 +44,7 @@ int main()
 		vertices[8]=vertex9;
 
 		//test texture
-		ssr::texture texture;
-
-		std::cout << "error: " << loadbmp_decode_file("../assets/test-tex.bmp", &texture.pixel_data, &texture.x, &texture.y, LOADBMP_RGB) << std::endl;
+		ssr::texture texture("../assets/smiley.bmp");
 
 
 
@@ -49,16 +52,16 @@ int main()
 		{
 			
 							ssr::vertex vertex1={-1,	-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 0}; //dark green
-							ssr::vertex vertex2={1,		-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 1};
-							ssr::vertex vertex3={-1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 0};
+							ssr::vertex vertex2={1,		-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 0};
+							ssr::vertex vertex3={-1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 1};
 
 							vertices[0]=vertex1;
 							vertices[1]=vertex2;
 							vertices[2]=vertex3;
 
-							ssr::vertex vertex10={-1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 0}; //dark green
+							ssr::vertex vertex10={-1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 1}; //dark green
 							ssr::vertex vertex11={1,	1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 1};
-							ssr::vertex vertex12={1,	-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	0, 1};
+							ssr::vertex vertex12={1,	-1+5*cos(i)+3,	10*sin(i)+15,	20,100,0,	1, 0};
 
 							vertices[9]=vertex10;
 							vertices[10]=vertex11;

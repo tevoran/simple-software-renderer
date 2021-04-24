@@ -50,13 +50,16 @@ namespace ssr
 		float v; //has to be between 0 and 1
 	};
 
-	struct texture
+	class texture
 	{
+	public:
 		//dimensions of the texture
 		uint32_t x;
 		uint32_t y;
 
 		unsigned char *pixel_data;
+	public:
+		texture(const char *path);
 	};
 
 

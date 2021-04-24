@@ -4,3 +4,6 @@
 [submodule "vendor/LoadBMP"]
 	path = vendor/LoadBMP
 	url = git@github.com:vallentin/LoadBMP.git
+[submodule "vendor/fast_obj"]
+	path = vendor/fast_obj
+	url = git@github.com:thisistherk/fast_obj.git
