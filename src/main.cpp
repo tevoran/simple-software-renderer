@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <math.h>
+#include <string>
 
 #include "ssr.hpp"
 
@@ -14,15 +15,21 @@
 
 #define reps2 100000000
 
-int main()
+int main(int argc, char **argv)
 {
 	try
 	{
+		if(argc!=3)
+		{
+			return 0;
+		}
+
+		fastObjMesh *teapot = fast_obj_read(argv[1]); //first argument is the path to the mesh
+		ssr::texture texture(argv[2]); //second argument is the path to the texture
+
 		//initializing renderer
 		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 1000);
 
-		//loading test model
-		fastObjMesh *teapot = fast_obj_read("../assets/teapot.obj");
 
 		ssr::vertex vertices[12];
 		
@@ -42,9 +49,6 @@ int main()
 		vertices[6]=vertex7;
 		vertices[7]=vertex8;
 		vertices[8]=vertex9;
-
-		//test texture
-		ssr::texture texture("../assets/smiley.bmp");
 
 
 
