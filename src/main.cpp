@@ -33,14 +33,17 @@ int main(int argc, char **argv)
 		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 1000);
 		uint32_t num_polygons=0;
 		ssr::vertex *mesh_vertices=renderer.load_mesh(argv[1], &num_polygons);
+		glm::vec3 mesh_pos=glm::vec3(0,0,10);
 
 
-		for(float i=0.1; i<10; i=i+0.1)
+		for(float i=0.0; i<1000; i=i+0.1)
 		{
+				mesh_pos.z+=0.01;
+				std::cout << mesh_pos.z << std::endl;
 			std::clock_t clock_begin = std::clock();	
 			for(uint32_t i = reps; i > 0; i--)
 			{
-				renderer.render(mesh_vertices, num_polygons, &texture, SSR_FILL);
+				renderer.render(mesh_vertices, num_polygons, mesh_pos, &texture, SSR_FILL);
 				renderer.update();
 			}
 			std::clock_t clock_end = std::clock();

@@ -34,7 +34,7 @@ ssr::vertex* ssr::renderer::load_mesh(const char * path, uint32_t *num_polygons)
 			{
 				tmp_vertices[i].x=*(mesh->positions+mesh->indices[num_vertices_done+i].p*3);
 				tmp_vertices[i].y=*(mesh->positions+mesh->indices[num_vertices_done+i].p*3+1);
-				tmp_vertices[i].z=*(mesh->positions+mesh->indices[num_vertices_done+i].p*3+2)+10;
+				tmp_vertices[i].z=*(mesh->positions+mesh->indices[num_vertices_done+i].p*3+2);
 
 				tmp_vertices[i].u=0;
 				tmp_vertices[i].v=0;
