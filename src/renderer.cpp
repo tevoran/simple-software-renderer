@@ -1,7 +1,6 @@
 #include "ssr.hpp"
 
 #include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <SDL2/SDL.h>
 
@@ -80,8 +79,6 @@ ssr::renderer::renderer(int res_x_in, int res_y_in, float fov_y, float aspect_ra
 		perspective_mat[3].y=0;
 		perspective_mat[3].z=0;
 		perspective_mat[3].w=1;
-
-		std::cout << glm::to_string(perspective_mat) << std::endl;
 }
 
 ssr::renderer::~renderer()
