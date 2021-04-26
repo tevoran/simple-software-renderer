@@ -154,7 +154,7 @@ void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offs
 
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
-void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3 mesh_pos, const ssr::texture *texture, uint32_t flags)
+void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3 mesh_pos, glm::vec3 *rot_axis, float rot_angle, const ssr::texture *texture, uint32_t flags)
 {	
 	//copies are necessary otherwise the raster function will exchange the vertices
 	struct vertex vertex1, vertex2, vertex3;
@@ -174,9 +174,9 @@ void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3
 		}*/
 
 		//vertex shader/vertex transformation
-		vertex_shader(&vertex1, &mesh_pos);
-		vertex_shader(&vertex2, &mesh_pos);
-		vertex_shader(&vertex3, &mesh_pos);
+		vertex_shader(&vertex1, &mesh_pos, rot_axis, rot_angle);
+		vertex_shader(&vertex2, &mesh_pos, rot_axis, rot_angle);
+		vertex_shader(&vertex3, &mesh_pos, rot_axis, rot_angle);
 		//std::cout << vertex1.z << std::endl << std::endl;
 
 		//rasterization
