@@ -153,9 +153,9 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 	if(flags==SSR_WIREFRAME)
 	{
 		//drawing in wireframe mode
-		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y), vertex1->r, vertex1->g, vertex1->b);
-		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y), vertex2->r, vertex2->g, vertex2->b);
-		raster_line(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y), vertex3->r, vertex3->g, vertex3->b);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y), 255, 255, 255);
+		raster_line(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y), 255, 255, 255);
+		raster_line(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y), 255, 255, 255);
 		return;
 	}
 

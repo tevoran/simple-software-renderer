@@ -13,8 +13,7 @@ void ssr::renderer::vertex_shader(ssr::vertex *vertex, glm::vec3 *mesh_pos, glm:
 {
 	glm::vec4 tmp=glm::vec4(vertex->x, -vertex->y, vertex->z, 1.0);
 
-	glm::mat4 id;
-	auto rot=glm::rotate<float>(rot_angle, *rot_axis);
+	glm::mat4 rot=glm::rotate(rot_angle, *rot_axis);
 	tmp=rot*tmp;
 
 	glm::vec4 pos=glm::vec4(mesh_pos->x, mesh_pos->y, mesh_pos->z, 0);
