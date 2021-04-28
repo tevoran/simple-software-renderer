@@ -203,7 +203,10 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 
 		//texture calculation
 		int64_t cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)*(vex3.x-vex2.x));
-
+		if(cramer_div==0)
+		{
+			return;
+		}
 
 		uint64_t z_current_line=vex1.z;
 
