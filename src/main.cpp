@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 10000);
 		uint32_t num_polygons=0;
 		ssr::vertex *mesh_vertices=renderer.load_mesh(argv[1], &num_polygons);
-		glm::vec3 mesh_pos=glm::vec3(0,1.5,11);
+		glm::vec3 mesh_pos=glm::vec3(0,500,4000);
 		glm::vec3 rot_axis=glm::vec3(0,1,0);
 
 		for(float i=0.0; i<100; i=i+0.003)
