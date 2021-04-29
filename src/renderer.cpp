@@ -166,18 +166,11 @@ void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3
 		vertex2=data[i*3+1];
 		vertex3=data[i*3+2];
 
-		//std::cout << vertex1.z << std::endl;
-		//there's a division by zero otherwise in the vertex shader
-		/*if(vertex1.z==0 || vertex2.z==0 || vertex3.z==0)
-		{
-			return;
-		}*/
 
 		//vertex shader/vertex transformation
 		vertex_shader(&vertex1, &mesh_pos, rot_axis, rot_angle);
 		vertex_shader(&vertex2, &mesh_pos, rot_axis, rot_angle);
 		vertex_shader(&vertex3, &mesh_pos, rot_axis, rot_angle);
-		//std::cout << vertex1.z << std::endl << std::endl;
 
 		//rasterization
 		raster_triangle(&vertex1, &vertex2, &vertex3, texture, flags);

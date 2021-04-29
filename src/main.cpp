@@ -47,23 +47,37 @@ int main(int argc, char **argv)
 							(min_coords.z*min_coords.z)+
 							(max_coords.x*max_coords.x)+
 							(max_coords.y*max_coords.y)+
-							(max_coords.z*max_coords.z))*4;
+							(max_coords.z*max_coords.z))*3;
 
 		glm::vec3 rot_axis=glm::vec3(0,1,0);
 
-
+		//FPS counter initialization
+		int FPS_count=0;
+		std::clock_t clock_begin = std::clock();
+		std::clock_t clock_end = std::clock();
+		
 		for(float i=0.0; i<100; i=i+0.003)
 		{
-				//mesh_pos.z+=0.01;
-				//std::cout << mesh_pos.z << std::endl;
-			std::clock_t clock_begin = std::clock();	
+			//FPS counter
+			std::clock_t clock_end = std::clock();
+			if((clock_end-clock_begin)*1000/CLOCKS_PER_SEC>1000)
+			{
+				std::cout << 
+							FPS_count << 
+							" FPS (average frametime: " << 
+							((clock_end-clock_begin)*1000/CLOCKS_PER_SEC)/FPS_count << 
+							"ms)" << 
+							std::endl;
+				clock_begin=clock_end;
+				FPS_count=0;
+			}
+			FPS_count++;
+
+			//handling mouse and keyboard input
+
+			//rendering mesh
 			renderer.render(mesh_vertices, num_polygons, mesh_pos, &rot_axis, i, &texture, SSR_FILL);
 			renderer.update();
-			std::clock_t clock_end = std::clock();
-			std::cout << "frame time: " << (clock_end-clock_begin)*1000/CLOCKS_PER_SEC << "ms" << std::endl;
-			//std::cout << "repetitions: " << reps << std::endl;
-			//SDL_Delay(10000);
-			//exit(0);
 		}
 
 	}

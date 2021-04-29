@@ -116,13 +116,13 @@ void ssr::renderer::raster_line(glm::ivec2 start, glm::ivec2 end, uint8_t r, uin
 void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::vertex *vertex2, struct ssr::vertex *vertex3, const ssr::texture *texture, uint32_t flags)
 {
 	/*checking if triangle actually needs to be rasterized*/
-	//end renderering, if vertices are beyond far plane
+	//end renderering, if vertices are beyond the far plane
 	if(vertex1->z>1 && vertex2->z>1 && vertex3->z>1)
 	{
 		return;
 	}
 
-	//end rendering if vertices are behind near plane
+	//end rendering if vertices are behind the near plane
 	if(vertex1->z<0 && vertex2->z<0 && vertex3->z<0)
 	{
 		return;
@@ -163,34 +163,6 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 	//drawing in fill mode
 	if(flags==SSR_FILL)
 	{
-
-		//avoiding divisions by zero
-		/*if(vex2.x-vex1.x==0)
-		{
-			vex2.x++;
-		}
-		if(vex3.x-vex1.x==0)
-		{
-			vex3.x++;
-		}
-		if(vex3.y-vex1.y==0)
-		{
-			vex3.y++;
-		}*/
-
-		//Z-Buffering stuff
-		//int64_t dz_dy=(vex3.z-vex1.z)/(vex3.y-vex1.y);
-		//int64_t dz_dx;
-
-		/*if((vex3.x-vex1.x)*(vex3.x-vex1.x)>(vex2.x-vex1.x)*(vex2.x-vex1.x))
-		{
-			dz_dx=(vex3.z-vex1.z)/(vex3.x-vex1.x);
-		}
-		else
-		{
-			dz_dx=(vex2.z-vex1.z)/(vex2.x-vex1.x);
-		}*/
-
 		ssr::renderer::triangle_line_rendering line1(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex3.x, vex3.y)); //line 1 (vex1-3)
 		ssr::renderer::triangle_line_rendering line2(glm::ivec2(vex1.x,vex1.y), glm::ivec2(vex2.x, vex2.y)); //line 2 (vex1-2)
 		ssr::renderer::triangle_line_rendering line3(glm::ivec2(vex2.x,vex2.y), glm::ivec2(vex3.x, vex3.y)); //line 3 (vex2-3)
