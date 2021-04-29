@@ -11,7 +11,7 @@
 
 void ssr::renderer::vertex_shader(ssr::vertex *vertex, glm::vec3 *mesh_pos, glm::vec3 *rot_axis, float rot_angle)
 {
-	glm::vec4 tmp=glm::vec4(vertex->x, -vertex->y, vertex->z, 1.0);
+	glm::vec4 tmp=glm::vec4(vertex->x, vertex->y, vertex->z, 1.0);
 
 	glm::mat4 rot=glm::rotate(rot_angle, *rot_axis);
 	tmp=rot*tmp;
@@ -23,6 +23,6 @@ void ssr::renderer::vertex_shader(ssr::vertex *vertex, glm::vec3 *mesh_pos, glm:
 	
 	//perspective divide and offset for screen, because of engine intern clipspace
 	vertex->x=out.x/(tmp.z)+0.5;
-	vertex->y=out.y/(tmp.z)+0.5;
+	vertex->y=-out.y/(tmp.z)+0.5;
 	vertex->z=out.z;
 }

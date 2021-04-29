@@ -165,7 +165,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 	{
 
 		//avoiding divisions by zero
-		if(vex2.x-vex1.x==0)
+		/*if(vex2.x-vex1.x==0)
 		{
 			vex2.x++;
 		}
@@ -176,7 +176,7 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		if(vex3.y-vex1.y==0)
 		{
 			vex3.y++;
-		}
+		}*/
 
 		//Z-Buffering stuff
 		//int64_t dz_dy=(vex3.z-vex1.z)/(vex3.y-vex1.y);

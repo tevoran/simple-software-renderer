@@ -31,11 +31,26 @@ int main(int argc, char **argv)
 
 		//SDL_Delay(100000);
 		//initializing renderer
-		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 10000);
+		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 1000000);
 		uint32_t num_polygons=0;
-		ssr::vertex *mesh_vertices=renderer.load_mesh(argv[1], &num_polygons);
-		glm::vec3 mesh_pos=glm::vec3(0,500,4000);
+		glm::vec3 min_coords=glm::vec3(0,0,0);
+		glm::vec3 max_coords=glm::vec3(0,0,0);
+		ssr::vertex *mesh_vertices=renderer.load_mesh(argv[1], &num_polygons, &max_coords, &min_coords);
+
+		//automatic positioning the mesh
+		glm::vec3 mesh_pos=glm::vec3(0,0,0);
+		mesh_pos.x=-(min_coords.x+max_coords.x)/2;
+		mesh_pos.y=-(min_coords.y+max_coords.y)/2;
+		mesh_pos.z=sqrt(
+							(min_coords.x*min_coords.x)+
+							(min_coords.y*min_coords.y)+
+							(min_coords.z*min_coords.z)+
+							(max_coords.x*max_coords.x)+
+							(max_coords.y*max_coords.y)+
+							(max_coords.z*max_coords.z))*4;
+
 		glm::vec3 rot_axis=glm::vec3(0,1,0);
+
 
 		for(float i=0.0; i<100; i=i+0.003)
 		{
