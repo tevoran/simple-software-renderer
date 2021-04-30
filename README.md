@@ -3,6 +3,8 @@ This is a simple software renderer used as an educational exercise for both C++ 
 It can be used as an OBJ model viewer. After compilation you just need pass your model and its intended BMP
 texture as the program's argument to see the textured model.
 
+`./ssr 'path/to/model.obj' 'path/to/texture.bmp'`
+
 ## compilation
 
 To compile the simple software renderer, you need to add GLM, and SDL2. As a compilation tool CMAKE is used.
