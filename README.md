@@ -1,5 +1,7 @@
 # simple-software-renderer
 This is a simple software renderer used as an educational exercise for both C++ and software rasterization.
+It can be used as an OBJ model viewer. After compilation you just need pass your model and its intended BMP
+texture as the program's argument to see the textured model.
 
 ## compilation
 
