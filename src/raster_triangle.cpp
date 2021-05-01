@@ -142,12 +142,10 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		std::swap(vertex1, vertex2);
 	}
 
-
 	//getting renderspace (screenspace) coordinates
 	glm::ivec3 vex1=glm::ivec3((float)vertex1->x*backbuffer->w, (float)vertex1->y*backbuffer->h, (float)vertex1->z*INT32_MAX);
 	glm::ivec3 vex2=glm::ivec3((float)vertex2->x*backbuffer->w, (float)vertex2->y*backbuffer->h, (float)vertex2->z*INT32_MAX);
 	glm::ivec3 vex3=glm::ivec3((float)vertex3->x*backbuffer->w, (float)vertex3->y*backbuffer->h, (float)vertex3->z*INT32_MAX);
-
 
 	//draw in wireframe mode
 	if(flags==SSR_WIREFRAME)
@@ -174,13 +172,16 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 		pixel.y=vex1.y;
 
 		//texture calculation
-		int64_t cramer_div=((vex2.x-vex1.x)*(vex3.y-vex2.y)-(vex2.y-vex1.y)*(vex3.x-vex2.x));
+		glm::vec2 vex_exact_1=glm::vec2(vertex1->x*res_x, vertex1->y*res_y);
+		glm::vec2 vex_exact_2=glm::vec2(vertex2->x*res_x, vertex2->y*res_y);
+		glm::vec2 vex_exact_3=glm::vec2(vertex3->x*res_x, vertex3->y*res_y);
+		float cramer_div=((vex_exact_2.x-vex_exact_1.x)*(vex_exact_3.y-vex_exact_2.y)-(vex_exact_2.y-vex_exact_1.y)*(vex_exact_3.x-vex_exact_2.x));
 		if(cramer_div==0)
 		{
 			return;
 		}
 
-		//uint64_t z_current_line=vex1.z;
+
 
 		//upper part of the triangle
 		while(pixel.y<vex2.y)
@@ -218,39 +219,57 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				{
 					pixel.x=0;
 				}
-				//pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 
 				//texture calculation optimizations
-				int32_t vex1_dy=vex1.y-pixel.y;
-				int32_t vex2_dy=vex2.y-pixel.y;
-				int32_t vex3_dy=vex3.y-pixel.y;
+				float vex1_dy=vex_exact_1.y-(float)pixel.y+0.5;
+				float vex2_dy=vex_exact_2.y-(float)pixel.y+0.5;
+				float vex3_dy=vex_exact_3.y-(float)pixel.y+0.5;
 
-				int32_t m1_dx=vex2_dy-vex3_dy;
-				int64_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
-				int32_t m1_line=m1_const+m1_dx*pixel.x;
+				float m1_dx=vex2_dy-vex3_dy;
+				float m1_const=vex_exact_2.x*vex3_dy-vex_exact_3.x*vex2_dy;
+				float m1_line=m1_const+m1_dx*((float)pixel.x-0.5);
 
-				int32_t m2_dx=vex3_dy-vex1_dy;
-				int32_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
-				int32_t m2_line=m2_const+m2_dx*pixel.x;
-
+				float m2_dx=vex3_dy-vex1_dy;
+				float m2_const=vex_exact_3.x*vex1_dy-vex_exact_1.x*vex3_dy;
+				float m2_line=m2_const+m2_dx*((float)pixel.x-0.5);
 
 				//the actual number of the pixel that is drawn
 				uint32_t pixel_offset;
 				pixel_offset=pixel.x+pixel.y*backbuffer->w;
 				while(pixel.x<=x_end && pixel_offset<(res_x*res_y))
 				{
+					
 					//texture calculation
 					//calculating u-v-coordinates
-					m1_line+=m1_dx;
-					m2_line+=m2_dx;
 					float m1=(float)m1_line/(float)cramer_div;
 					float m2=(float)m2_line/(float)cramer_div;
+
+					if(m1>1)
+					{
+						m1=1;
+						m2=0;
+					}
+					if(m1<0)
+					{
+						m1=0;
+					}
+					if(m2>1)
+					{
+						m1=0;
+						m2=1;
+					}
+					if(m2<0)
+					{
+						m2=0;
+					}
+					
 					float m3=1-m1-m2;
 
-					pixel.u=(float)m1*vertex1->u+(float)m2*vertex2->u+(float)m3*vertex3->u;
-					pixel.v=(float)m1*vertex1->v+(float)m2*vertex2->v+(float)m3*vertex3->v;
+					pixel.u=(float)m1*(float)vertex1->u+(float)m2*(float)vertex2->u+(float)m3*(float)vertex3->u;
+					pixel.v=(float)m1*(float)vertex1->v+(float)m2*(float)vertex2->v+(float)m3*(float)vertex3->v;
 
 					pixel.z=(float)m1*vex1.z+(float)m2*vex2.z+(float)m3*vex3.z;
+
 
 					pixel.u=abs(pixel.u-(int)pixel.u);
 					pixel.v=abs(pixel.v-(int)pixel.v);
@@ -261,6 +280,8 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 					}
 					pixel_offset++;
 					pixel.x++;
+					m1_line+=m1_dx;
+					m2_line+=m2_dx;
 				}
 			}
 		}
@@ -302,20 +323,20 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				{
 					pixel.x=0;
 				}
-				//pixel.z=z_current_line+(pixel.x-vex1.x)*dz_dx;
 				
 				//texture calculation optimizations
-				int32_t vex1_dy=vex1.y-pixel.y;
-				int32_t vex2_dy=vex2.y-pixel.y;
-				int32_t vex3_dy=vex3.y-pixel.y;
+				float vex1_dy=vex_exact_1.y-(float)pixel.y+0.5;
+				float vex2_dy=vex_exact_2.y-(float)pixel.y+0.5;
+				float vex3_dy=vex_exact_3.y-(float)pixel.y+0.5;
 
-				int32_t m1_dx=vex2_dy-vex3_dy;
-				int32_t m1_const=vex2.x*vex3_dy-vex3.x*vex2_dy;
-				int32_t m1_line=m1_const+m1_dx*pixel.x;
+				float m1_dx=vex2_dy-vex3_dy;
+				float m1_const=vex_exact_2.x*vex3_dy-vex_exact_3.x*vex2_dy;
+				float m1_line=m1_const+m1_dx*((float)pixel.x-0.5);
 
-				int32_t m2_dx=vex3_dy-vex1_dy;
-				int32_t m2_const=vex3.x*vex1_dy-vex1.x*vex3_dy;
-				int32_t m2_line=m2_const+m2_dx*pixel.x;
+				float m2_dx=vex3_dy-vex1_dy;
+				float m2_const=vex_exact_3.x*vex1_dy-vex_exact_1.x*vex3_dy;
+				float m2_line=m2_const+m2_dx*((float)pixel.x-0.5);
+
 
 				//the actual number of the pixel that is drawn
 				uint32_t pixel_offset;
@@ -324,14 +345,32 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 				{
 					//texture calculation
 					//calculating u-v-coordinates
-					m1_line+=m1_dx;
-					m2_line+=m2_dx;
 					float m1=(float)m1_line/(float)cramer_div;
 					float m2=(float)m2_line/(float)cramer_div;
+
+					if(m1>1)
+					{
+						m1=1;
+						m2=0;
+					}
+					if(m1<0)
+					{
+						m1=0;
+					}
+					if(m2>1)
+					{
+						m1=0;
+						m2=1;
+					}
+					if(m2<0)
+					{
+						m2=0;
+					}
+
 					float m3=1-m1-m2;
 
-					pixel.u=(float)m1*vertex1->u+(float)m2*vertex2->u+(float)m3*vertex3->u;
-					pixel.v=(float)m1*vertex1->v+(float)m2*vertex2->v+(float)m3*vertex3->v;
+					pixel.u=(float)m1*(float)vertex1->u+(float)m2*(float)vertex2->u+(float)m3*(float)vertex3->u;
+					pixel.v=(float)m1*(float)vertex1->v+(float)m2*(float)vertex2->v+(float)m3*(float)vertex3->v;
 
 					pixel.z=(float)m1*vex1.z+(float)m2*vex2.z+(float)m3*vex3.z;
 
@@ -344,6 +383,8 @@ void ssr::renderer::raster_triangle(struct ssr::vertex *vertex1, struct ssr::ver
 					}
 					pixel_offset++;
 					pixel.x++;
+					m1_line+=m1_dx;
+					m2_line+=m2_dx;
 				}
 			}
 		}

@@ -123,6 +123,7 @@ namespace ssr
 			void draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offset); //draws at the pixel offset and the z-buffer check needs already to be done
 			void texture_map(struct ssr::pixel *data, const struct ssr::texture *texture);
 			void render(struct vertex *data, uint32_t num_polygons, glm::vec3 mesh_pos, glm::vec3 *rot_axis, float rot_angle, const ssr::texture *texture, uint32_t flags);
+			void validate_window();
 			ssr::vertex* load_mesh(const char * path, uint32_t *num_polygons, glm::vec3 *max_coords, glm::vec3 *min_coords);
 
 	};

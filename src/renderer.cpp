@@ -52,6 +52,8 @@ ssr::renderer::renderer(int res_x_in, int res_y_in, float fov_y, float aspect_ra
 			std::cout << "Format: " << SDL_GetPixelFormatName(pixel_type) << std::endl;
 		}
 
+	SDL_LockSurface(backbuffer);
+
 	//renderer initialization
 		//Z-Buffer initialization
 		z_buffer=new uint64_t[backbuffer->w * backbuffer->h];
@@ -89,15 +91,23 @@ ssr::renderer::~renderer()
 //clears the background to black
 void ssr::renderer::update()
 {
+	SDL_UnlockSurface(backbuffer);
+
 	//render changed backbuffer onto the screen
 	if(SDL_UpdateWindowSurface(window)!=0)
 	{
 		std::cout << "SDL ERROR MSG: " << std::endl << SDL_GetError() << std::endl;
 	}
 
+	backbuffer=SDL_GetWindowSurface(window);
+	res_x=backbuffer->w;
+	res_y=backbuffer->h;
+
+	SDL_LockSurface(backbuffer);
+
 	//clearing screen
-	static void *pixel_ptr = static_cast<void*>(backbuffer->pixels);
-	memset(pixel_ptr, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
+	memset((void*)backbuffer->pixels, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
+
 
 	//clearing screen
 	//RGB pixel format
@@ -152,6 +162,31 @@ void ssr::renderer::draw_pixel_fast(struct ssr::pixel *data, uint32_t pixel_offs
 	z_buffer[pixel_offset]=data->z;
 }
 
+void ssr::renderer::validate_window()
+{
+	backbuffer=SDL_GetWindowSurface(window);
+	res_x=backbuffer->w;
+	res_y=backbuffer->h;
+
+	SDL_LockSurface(backbuffer);
+
+	//clearing screen
+	memset((void*)backbuffer->pixels, 0, (backbuffer->h)*(backbuffer->w)*sizeof(uint32_t));
+
+	//clearing screen
+	//RGB pixel format
+	//highest byte is red, lowest byte is blue
+	if(pixel_type != SDL_PIXELFORMAT_RGB888)
+	{
+		throw "SDL: unknown pixel format and cannot clear the screen";
+	}
+	else
+	{
+		//necessary if pixelformat is different, then the renderer needs to rewrite the buffer to
+		//suit the pixelformant
+	}
+}
+
 /*the renderer uses a clip space that is similar to OpenGL. But the clip space's borders are
 0 and 1 along the different axes.*/
 void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3 mesh_pos, glm::vec3 *rot_axis, float rot_angle, const ssr::texture *texture, uint32_t flags)
@@ -175,15 +210,6 @@ void ssr::renderer::render(struct vertex *data, uint32_t num_polygons, glm::vec3
 		//rasterization
 		raster_triangle(&vertex1, &vertex2, &vertex3, texture, flags);
 	}
-
-
-
-
-
-
-
-	//vertex transformation aka vertex shader
-	glm::vec4 vex={1,1,1,0};
 
 	return;	
 }
