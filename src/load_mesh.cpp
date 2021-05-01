@@ -103,5 +103,6 @@ ssr::vertex* ssr::renderer::load_mesh(const char * path, uint32_t *num_polygons,
 		}
 
 		*num_polygons=num_total_vertices/3;
+		fast_obj_destroy(mesh);
 		return mesh_vertices;
 }

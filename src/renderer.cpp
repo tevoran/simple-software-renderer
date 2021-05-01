@@ -33,7 +33,7 @@ ssr::renderer::renderer(int res_x_in, int res_y_in, float fov_y, float aspect_ra
 											SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 											res_x, 
 											res_y, 
-											SDL_WINDOW_FULLSCREEN);
+											0);
 		if(window==NULL)
 		{
 			throw "SDL couldn't create window";

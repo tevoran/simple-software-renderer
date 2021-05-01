@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
 		//SDL_Delay(100000);
 		//initializing renderer
-		ssr::renderer renderer(1920, 1080 ,0.5*PI, (float)16/(float)9, 0.01, 1000000);
+		ssr::renderer renderer(800, 800 ,0.5*PI, (float)1/(float)1, 0.01, 1000000);
 		uint32_t num_polygons=0;
 		glm::vec3 min_coords=glm::vec3(0,0,0);
 		glm::vec3 max_coords=glm::vec3(0,0,0);
@@ -122,6 +122,8 @@ int main(int argc, char **argv)
 			//rendering mesh
 			renderer.render(mesh_vertices, num_polygons, mesh_pos, &rot_axis, i, &texture, SSR_FILL);
 			renderer.update();
+			//SDL_Delay(5000);
+			//exit(0);
 		}
 
 	}
